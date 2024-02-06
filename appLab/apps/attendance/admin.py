@@ -17,3 +17,4 @@ admin.site.register(Classses)
 admin.site.register(Teams)
 admin.site.register(Students)
 admin.site.register(Attendance, AttendanceAdmin)
+ready
