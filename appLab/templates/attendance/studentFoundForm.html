@@ -1,0 +1,42 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+{% block content %}
+
+<main class="container-fluid h-screen flex flex-col justify-center items-center gap-12">
+
+    <h1 class="font-exo text-6xl">Ingreso de estudiante</h1>
+
+    <form method="post" class="w-2/3 flex flex-col gap-3">{% csrf_token %}
+
+
+        <div class="flex flex-col gap-1">
+            <label class="font-exo text-base font-semibold text-gray-500">{{ form.rut.label }}</label>
+            {{ form.rut }}
+        </div>
+
+        {% if form.errors %}
+        <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li class="text-red-600 list-disc font-bold">{{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+
+        <input type="submit" value="Registrar"
+            class="mt-5 px-10 py-4 text-center text-lg outline outline-1 outline-gray-400 text-gray-600 font-rale hover:outline-gray-600 hover:bg-sky-800 hover:text-white transition-all duration-300">
+
+
+    </form>
+
+</main>
+
+
+
+{% endblock content %}

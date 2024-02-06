@@ -1,0 +1,59 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+{% block content %}
+
+<main class="container-fluid h-screen flex flex-col justify-center items-center gap-12">
+
+    <h1 class="font-exo text-6xl">Formulario de asistencia</h1>
+
+    <div class="text-center">
+        <h3 class="font-exo text-xl mb-4">Bienvenido {{ student.name }}.
+        </h3>
+        <p class="font-exo text-lg">Porfavor selecciona cuanto tiempo piensas permanecer en el laboratorio.</p>
+    </div>
+
+
+    <form method="post" class="w-2/3 flex flex-col gap-3">{% csrf_token %}
+
+        {% if 'ok' in request.GET %}
+
+        <p class="mt-4 font-exo text-xl text-green-600 text-center">¡Gracias por asistir al laboratorio!</p>
+
+        <a href="{% url 'attendance_app:student' %}"
+            class="mt-8 px-10 py-4 text-center text-lg outline outline-1 outline-sky-700 text-gray-600 font-rale hover:outline-gray-600 hover:bg-gray-50 hover:text-black transition-all duration-300">
+            Volver</a>
+
+        {% else %}
+        
+
+        <div class="flex flex-col gap-1">
+            <label class="font-exo text-base font-semibold text-gray-500">{{ form.time_inside.label }}</label>
+            {{ form.time_inside }}
+        </div>
+
+        {% if form.errors %}
+        <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li class="text-red-600 list-disc font-bold">{{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+
+        <input type="submit" value="Registrar"
+            class="mt-5 px-10 py-4 text-center text-lg outline outline-1 outline-gray-400 text-gray-600 font-rale hover:outline-gray-600 hover:bg-sky-800 hover:text-white transition-all duration-300">
+
+        {% endif %}
+    </form>
+
+</main>
+
+
+
+{% endblock content %}
