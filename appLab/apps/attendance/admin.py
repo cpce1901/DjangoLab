@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.db import models
 from django.utils.html import format_html
+from import_export.resources import ModelResource
+from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from .models import Attendance, Students, Classes, Teams, Schools
+
+class AttendanceResource(ModelResource):
+    class Meta:
+        model = Attendance
+        use_bulk = True
+        batch_size = 500
 
 
 # Inlines
@@ -22,7 +30,7 @@ class StudentInline(admin.TabularInline):
     
 
 class ClassesAdmin(admin.ModelAdmin):
-    list_display = ['name', 'get_teams']
+    list_display = ['name', 'code','school','get_teams']
     inlines = [TeamsInline, ]
 
     def get_teams(self, obj):
@@ -61,14 +69,7 @@ class TeamsAdmin(admin.ModelAdmin):
     get_class.short_description = "Asignatura"
     get_teams.short_description = "Grupo de trabajo"
  
-    
-class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ['student', 'date_in']
-    search_fields =['student__name', 'student__last_name']
-
-    def student(self, obj):
-        return obj
-
+   
 
 class StudentsAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'rut', 'get_class', 'get_team']
@@ -93,7 +94,15 @@ class StudentsAdmin(admin.ModelAdmin):
     get_team.short_description = "Equipo"
  
     
-    
+class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = AttendanceResource
+    list_display = ['student', 'date_in', 'time_inside']
+    search_fields =['student__name', 'student__last_name']
+
+    def student(self, obj):
+        return obj
+
+
     
     
 admin.site.register(Schools)

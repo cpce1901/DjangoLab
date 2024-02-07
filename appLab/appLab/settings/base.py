@@ -17,6 +17,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # APPS_TERCEROS
+    'import_export',
+
     # APPS_LOCALES
     'apps.attendance',
     'apps.inventory'

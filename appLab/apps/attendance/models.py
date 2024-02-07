@@ -48,6 +48,7 @@ class Teams(models.Model):
     class Meta():
         verbose_name = "Equipo"
         verbose_name_plural = "Equipos"
+        
 
     def __str__(self):
         return f"{self.name}"
@@ -55,7 +56,7 @@ class Teams(models.Model):
 
 class Attendance(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name='Estudiante')
-    date_in = models.DateTimeField('Fecha', auto_now_add = True)
+    date_in = models.DateTimeField('Ingreso', auto_now_add = True)
     time_inside = models.TimeField('Tiempo estimado de permanencia')
 
     class Meta():
