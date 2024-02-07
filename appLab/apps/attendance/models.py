@@ -1,9 +1,35 @@
 from django.db import models
-from datetime import datetime
 
 
-class Classses(models.Model):
+class Students(models.Model):
     name = models.CharField('Nombre', max_length=32)
+    last_name = models.CharField('Apellido', max_length=32)
+    rut = models.CharField('RUT', max_length=10)
+
+
+    class Meta():
+        verbose_name = "Estudiante"
+        verbose_name_plural = "Estudiantes"
+
+    def __str__(self):
+        return f"{self.name} {self.last_name}"
+
+
+class Schools(models.Model):
+    name = models.CharField('Escuela', max_length=64)
+
+    class Meta():
+        verbose_name = "Escuela"
+        verbose_name_plural = "Escuelas"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Classes(models.Model):
+    school = models.ForeignKey(Schools, on_delete=models.CASCADE, verbose_name='Escuela', related_name='school')
+    name = models.CharField('Asignatura', max_length=64)
+    code = models.CharField('Codigo', max_length=16)
     teacher = models.CharField('Profesor', max_length=32)
 
     class Meta():
@@ -16,31 +42,15 @@ class Classses(models.Model):
 
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
-    clase = models.ForeignKey(Classses, on_delete=models.CASCADE, verbose_name='Clase')
-
-
+    class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name')
+    students = models.ManyToManyField(Students, verbose_name="Estudiantes", blank=True)
+    
     class Meta():
         verbose_name = "Equipo"
         verbose_name_plural = "Equipos"
 
     def __str__(self):
         return f"{self.name}"
-
-
-
-class Students(models.Model):
-    name = models.CharField('Nombre', max_length=32)
-    last_name = models.CharField('Apellido', max_length=32)
-    rut = models.CharField('RUT', max_length=10)
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE, verbose_name='Equipo')
-
-    class Meta():
-        verbose_name = "Estudiante"
-        verbose_name_plural = "Estudiantes"
-
-    def __str__(self):
-        return f"{self.name} {self.last_name}"
-
 
 
 class Attendance(models.Model):
