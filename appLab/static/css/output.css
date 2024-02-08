@@ -566,14 +566,6 @@ video {
   margin-top: 2rem;
 }
 
-.mb-10{
-  margin-bottom: 2.5rem;
-}
-
-.mb-12{
-  margin-bottom: 3rem;
-}
-
 .block{
   display: block;
 }
@@ -584,10 +576,6 @@ video {
 
 .h-screen{
   height: 100vh;
-}
-
-.h-2\/3{
-  height: 66.666667%;
 }
 
 .w-2\/3{
@@ -622,12 +610,9 @@ video {
   gap: 0.75rem;
 }
 
-.p-20{
-  padding: 5rem;
-}
-
-.p-16{
-  padding: 4rem;
+.bg-indigo-500{
+  --tw-bg-opacity: 1;
+  background-color: rgb(99 102 241 / var(--tw-bg-opacity));
 }
 
 .px-10{
@@ -638,26 +623,6 @@ video {
 .py-4{
   padding-top: 1rem;
   padding-bottom: 1rem;
-}
-
-.py-10{
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-}
-
-.py-20{
-  padding-top: 5rem;
-  padding-bottom: 5rem;
-}
-
-.py-16{
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
-.px-8{
-  padding-left: 2rem;
-  padding-right: 2rem;
 }
 
 .text-center{
@@ -690,11 +655,6 @@ video {
 .text-xl{
   font-size: 1.25rem;
   line-height: 1.75rem;
-}
-
-.text-4xl{
-  font-size: 2.25rem;
-  line-height: 2.5rem;
 }
 
 .font-bold{
@@ -733,16 +693,16 @@ video {
   outline-width: 1px;
 }
 
+.outline-gray-300{
+  outline-color: #d1d5db;
+}
+
 .outline-gray-400{
   outline-color: #9ca3af;
 }
 
 .outline-sky-700{
   outline-color: #0369a1;
-}
-
-.outline-gray-300{
-  outline-color: #d1d5db;
 }
 
 .transition-all{
@@ -778,6 +738,11 @@ video {
 .hover\:bg-sky-800:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(7 89 133 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-indigo-500:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(99 102 241 / var(--tw-bg-opacity));
 }
 
 .hover\:text-black:hover{
