@@ -16,25 +16,25 @@ class Students(models.Model):
 
 
 class Schools(models.Model):
-    name = models.CharField('Escuela', max_length=64)
+    name = models.CharField('Carrera', max_length=64)
 
     class Meta():
-        verbose_name = "Escuela"
-        verbose_name_plural = "Escuelas"
+        verbose_name = "Carrera"
+        verbose_name_plural = "Carreras"
 
     def __str__(self):
         return f"{self.name}"
 
 
 class Classes(models.Model):
-    school = models.ForeignKey(Schools, on_delete=models.CASCADE, verbose_name='Escuela', related_name='school')
+    school = models.ForeignKey(Schools, on_delete=models.CASCADE, verbose_name='Carrera', related_name='school')
     name = models.CharField('Asignatura', max_length=64)
     code = models.CharField('Codigo', max_length=16)
     teacher = models.CharField('Profesor', max_length=32)
 
     class Meta():
-        verbose_name = "Clase"
-        verbose_name_plural = "Clases"
+        verbose_name = "Asignatura"
+        verbose_name_plural = "Asignaturas"
 
     def __str__(self):
         return f"{self.name} {self.teacher}"

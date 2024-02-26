@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db import models
 from django.utils.html import format_html
 from import_export.resources import ModelResource
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
