@@ -7,7 +7,7 @@ class StudentFoundForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             "id": "rut",
-            "placeholder": "Ingresa un RUT sin puntos ni guión.",
+            "placeholder": "RUT sin puntos ni guión.",
             "class": "text-input",
         }),
     )
@@ -29,7 +29,7 @@ class AttendanceForm(forms.Form):
             choices=OPTIONS,
             attrs={
             "id": "time_inside",
-            "class": "outline outline-1 outline-gray-300 text-center text-xl",
+            "class": "py-2 outline outline-1 outline-gray-300 text-center xl:text-xl",
         }),
     )
 

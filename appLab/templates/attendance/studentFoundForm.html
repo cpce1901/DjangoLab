@@ -6,21 +6,24 @@
 
 {% block content %}
 
-<main class="container-fluid h-screen flex flex-col justify-center items-center gap-12">
+<main class="container mx-auto h-screen flex flex-col justify-center items-center gap-12">
 
-    <h1 class="font-exo text-6xl">Ingreso de estudiante</h1>
+    <h1 class="font-exo text-6xl text-center">Ingreso de estudiante</h1>
 
     <form method="post" class="w-2/3 flex flex-col gap-3">{% csrf_token %}
 
 
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 mb-6 xl:mb-0">
             <label class="font-exo text-base font-semibold text-gray-500">{{ form.rut.label }}</label>
             {{ form.rut }}
-        </div>      
+        </div>
 
         <input type="submit" value="Registrar"
-            class="mt-5 px-10 py-4 text-center text-lg outline outline-1 outline-gray-400 text-gray-600 font-rale  hover:outline-gray-600 hover:bg-indigo-500 hover:text-white transition-all duration-300">
+            class="mt-5 px-10 py-4 text-center text-lg outline outline-1 outline-gray-400 font-rale bg-indigo-500 text-white xl:bg-white xl:text-gray-600 hover:outline-gray-600 hover:bg-indigo-500 hover:text-white transition-all duration-300">
 
+        <a href="{% url 'attendance_app:student' %}"
+            class="mt-8 px-10 py-4 text-center text-lg outline outline-1 outline-gray-400 text-white font-rale bg-green-600 xl:bg-white xl:text-gray-600 hover:bg-green-600 hover:text-white transition-all duration-300">
+            Borrar</a>
 
     </form>
 

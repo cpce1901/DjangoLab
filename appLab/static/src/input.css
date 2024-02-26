@@ -4,11 +4,8 @@
 @tailwind utilities;
 
 .text-input{
-    @apply px-4 py-1 text-lg outline outline-1 outline-gray-200 text-gray-600 font-rale
+    @apply px-4 py-1 text-lg outline outline-1 outline-gray-200 text-gray-600 font-rale text-center
 }
 
-@layer base{
 
-   
-}
 
