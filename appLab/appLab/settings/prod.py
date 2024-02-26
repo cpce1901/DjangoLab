@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost']
 
 DATABASES = {
     'default': {
@@ -12,4 +12,4 @@ DATABASES = {
 }
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static/"]
+STATIC_ROOT = BASE_DIR / 'static/'
