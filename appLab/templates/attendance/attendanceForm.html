@@ -4,6 +4,12 @@
 <!-- Carga archivos estaticos -->
 {% load static %}
 
+<!-- Carga title page -->
+{% block title %}
+Ingreso Estudiante - LAB4.0
+{% endblock title %}
+
+<!-- Carga content page -->
 {% block content %}
 
 <main class="container-fluid h-screen flex flex-col justify-center items-center gap-12">
@@ -52,6 +58,52 @@
             Volver</a>
 
     </form>
+
+    <div>
+        {% if messages %}
+
+        {% for message in messages %}
+
+        {% if message.tags == "success" %}
+
+        <script>
+            Swal.fire({
+                title: 'Éxito',
+                text: '{{ message }}',
+                icon: 'success',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "error" %}
+
+        <script>
+            Swal.fire({
+                title: 'Error',
+                text: '{{ message }}',
+                icon: 'error',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "info" %}
+
+        <script>
+            Swal.fire({
+                title: 'Exito',
+                text: '{{ message }}',
+                icon: 'info',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% endif %}
+
+        {% endfor %}
+
+        {% endif %}
+
+    </div>
 
 </main>
 

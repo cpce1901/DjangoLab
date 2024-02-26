@@ -29,7 +29,7 @@ class AttendanceForm(forms.Form):
             choices=OPTIONS,
             attrs={
             "id": "time_inside",
-            "class": "outline outline-1 outline-gray-300 text-center text-6xl",
+            "class": "outline outline-1 outline-gray-300 text-center text-xl",
         }),
     )
 

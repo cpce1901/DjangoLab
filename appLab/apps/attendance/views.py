@@ -1,8 +1,9 @@
 from django.views.generic import FormView
-from .form import AttendanceForm, StudentFoundForm
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.contrib import messages
 from .models import Students, Attendance
+from .form import AttendanceForm, StudentFoundForm
 from datetime import datetime, time, timedelta
 
 
@@ -40,12 +41,18 @@ class StudentFoundFormView(FormView):
                     return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': id_student}))
                 else:            
                     remaining_time = total_time - time_now_delta
-                    form.add_error(None, f"Tienes un registro de ingreso a las {when_in_time.strftime('%H:%M:%S')} por {time_inside_time.hour} hr(s), aún tienes tiempo en el laboratorio. Falta {remaining_time}. ")
+                    messages.info(
+                    self.request,
+                    f"Tienes un registro de ingreso a las {when_in_time.strftime('%H:%M:%S')} por {time_inside_time.hour} hr(s), aún tienes tiempo en el laboratorio. Falta {remaining_time}. "
+                    )
                     return self.form_invalid(form)
             else:
                 return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': id_student}))
-        else:
-            form.add_error(None, "El RUT no coincide con ningún estudiante. Inténtalo otra vez.")
+        else:            
+            messages.error(
+                self.request,
+                "El RUT no coincide con ningún estudiante. Inténtalo otra vez."
+            )
             return self.form_invalid(form)
             
 
@@ -69,7 +76,10 @@ class AttendanceFormView(FormView):
         time_inside = form.cleaned_data["time_inside"]
 
         if time_inside <= 0 or time_inside > 3:
-            form.add_error(None, "Debes seleccionar un tiempo valido de estadia...")
+            messages.error(
+                self.request,
+                "Debes seleccionar un tiempo valido de estadia..."
+            )
             return self.form_invalid(form)
         
         if time_inside > 0:
