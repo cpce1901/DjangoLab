@@ -118,7 +118,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         if students:
             output = "<ul>"
             for student in students:
-                output += f"<li>{student.name}</li>"
+                output += f"<li>{student.name} { student.last_name }</li>"
             output += "</ul>"
             return format_html(output)
         else:
