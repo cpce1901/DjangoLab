@@ -4,6 +4,7 @@ from import_export.resources import ModelResource
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from .models import Attendance, Students, Classes, Teams, Schools
 from .models import Students, Teams, Classes
+from django.db.models import Q
 
 # Resources
 class AttendanceResource(ModelResource):
@@ -48,6 +49,7 @@ class ClassesIline(admin.TabularInline):
 
 
 class TeamsInline(admin.TabularInline):
+    filter_vertical = ('students',)
     model = Teams
     extra = 0
 
@@ -58,14 +60,61 @@ class StudentInline(admin.TabularInline):
 
 
 # ModelAdmin by Models
+    
+@admin.register(Schools)
+class SchoolsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    '''
+    Administyración carrera
+    
+    '''
+
+    resource_class = SchoolsResource
+    list_display = ('sede_code', 'code', 'name')
+    inlines = (ClassesIline,)
+    
+
+@admin.register(Classes)
+class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    '''
+    Administyración asignaturas
+    
+    '''
+
+    resource_class = ClassesResource
+    list_display = ('display_school_code', 'stage', 'year', 'code', 'name', 'teacher', 'display_teams')
+    search_fields = ('school__name', 'year')
+    list_filter = ('year', 'stage', 'code')
+    inlines = (TeamsInline, )
+
+    @admin.display(description='Codigo')
+    def display_school_code(self, obj):
+        return obj.school.code
+
+    def display_teams(self, obj):
+        teams = obj.class_name.all()
+        if teams:
+            output = "<ul>"
+            for team in teams:
+                output += f"<li>{team.name}</li>"
+            output += "</ul>"
+            return format_html(output)
+        else:
+            return "No hay equipos asociados"
+        
+    display_teams.short_description = 'Equipos'
+
+
+
+
 @admin.register(Teams)
 class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TeamsResource    
     list_display = ('name', 'get_class', 'get_year', 'get_stage', 'get_students') 
-    search_fields = ('class_name__name', 'class_name__year', 'class_name__stage')
+    filter_horizontal = ('students', )
+    search_fields = ('name', 'class_name__name', 'class_name__year')
 
     def get_students(self, obj):
-        students = obj.team.all()
+        students = obj.students.all()
         if students:
             output = "<ul>"
             for student in students:
@@ -87,6 +136,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         class_stage = obj.class_name.get_stage_display() if obj.class_name else None
         return f'{class_stage} Semestre'
     
+    
     get_class.short_description = "Asignatura"
     get_year.short_description = "Año"
     get_stage.short_description = "Semestre"
@@ -96,35 +146,54 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
-    list_display = ('name', 'last_name', 'rut', 'email', 'display_class', 'display_year', 'display_stage', 'display_team')
+    list_display = ('display_full_name', 'id', 'rut', 'email', 'display_class', 'display_year', 'display_stage', 'display_team')
     search_fields = ('name', 'last_name', 'team__class_name__year')
-    autocomplete_fields = ["team"]
-
-    @admin.display(description='Grupo')
-    def display_team(self, obj):
-        if obj.team:
-            return obj.team.name
+    ordering = ('name', )
+   
+    @admin.display(description='Nombre completo')
+    def display_full_name(self, obj):
+        if obj:
+            return f'{obj.name} {obj.last_name}'
         return '-'
     
+    @admin.display(description='Grupo')
+    def display_team(self, obj):
+        equipos_del_estudiante = obj.teams_set.all()
+        nombres_asignaturas = []
+        for equipo in equipos_del_estudiante:
+            nombres_asignaturas.append(equipo.name)
+        return ", ".join(nombres_asignaturas)
+    
+
     @admin.display(description='Asignatura')
     def display_class(self, obj):
-        if obj.team and obj.team.class_name:
-            return obj.team.class_name.name
-        return '-'
+        equipos_del_estudiante = obj.teams_set.all()
+        nombres_asignaturas = []
+        for equipo in equipos_del_estudiante:
+            nombres_asignaturas.append(equipo.class_name.name)
+        return ", ".join(nombres_asignaturas)
+        
     
     @admin.display(description='Año')
     def display_year(self, obj):
-        if obj.team and obj.team.class_name:
-            return obj.team.class_name.year
-        return '-'
+        equipos_del_estudiante = obj.teams_set.all()
+        print(equipos_del_estudiante)
+        nombres_asignaturas = []
+        for equipo in equipos_del_estudiante:
+            nombres_asignaturas.append(str(equipo.class_name.year))
+        return ", ".join(nombres_asignaturas)
+        
     
     @admin.display(description='Semestre')
     def display_stage(self, obj):
-        if obj.team and obj.team.class_name:
-            return obj.team.class_name.get_stage_display()
-        return '-'
-    
-   
+        equipos_del_estudiante = obj.teams_set.all()
+        nombres_asignaturas = []
+        for equipo in equipos_del_estudiante:
+            nombres_asignaturas.append(equipo.class_name.get_stage_display())
+        return ", ".join(nombres_asignaturas)
+       
+
+
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
@@ -134,45 +203,7 @@ class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     def student(self, obj):
         return obj
 
+   
 
-@admin.register(Classes)
-class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
-    '''
-    Administyración asignaturas
-    
-    '''
-
-    resource_class = ClassesResource
-    list_display = ('year', 'stage', 'school', 'code', 'name', 'teacher', 'display_teams')
-    search_fields = ('school__name', 'year')
-    list_filter = ('year', 'stage', 'code')
-    inlines = (TeamsInline, )
-
-    def display_teams(self, obj):
-        teams = obj.class_name.all()
-        if teams:
-            output = "<ul>"
-            for team in teams:
-                output += f"<li>{team.name}</li>"
-            output += "</ul>"
-            return format_html(output)
-        else:
-            return "No hay equipos asociados"
-        
-    display_teams.short_description = 'Equipos'
-
-
-@admin.register(Schools)
-class SchoolsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
-    '''
-    Administyración carrera
-    
-    '''
-
-    resource_class = SchoolsResource
-    list_display = ('sede_code', 'code', 'name')
-    inlines = (ClassesIline,)
-    
-    
 
 
