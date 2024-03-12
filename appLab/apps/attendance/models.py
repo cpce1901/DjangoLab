@@ -76,7 +76,7 @@ class Students(models.Model):
     last_name = models.CharField('Apellido', max_length=32)
     rut = models.CharField('RUT', max_length=10)
     email = models.EmailField('Email', null=True)
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE, verbose_name='Equipo', related_name='team', null=True, blank=True)
+    team = models.ForeignKey(Teams, on_delete=models.SET_NULL, verbose_name='Equipo', related_name='team', null=True, blank=True)
 
 
     class Meta():

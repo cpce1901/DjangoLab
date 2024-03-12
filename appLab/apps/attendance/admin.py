@@ -97,28 +97,32 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
     list_display = ('name', 'last_name', 'rut', 'email', 'display_class', 'display_year', 'display_stage', 'display_team')
-    search_fields = ['name', 'last_name', 'team__class_name__year']
+    search_fields = ('name', 'last_name', 'team__class_name__year')
     autocomplete_fields = ["team"]
 
     @admin.display(description='Grupo')
     def display_team(self, obj):
-        team = obj.team
-        return team.name
+        if obj.team:
+            return obj.team.name
+        return '-'
     
     @admin.display(description='Asignatura')
     def display_class(self, obj):
-        class_student = obj.team.class_name 
-        return class_student.name
+        if obj.team and obj.team.class_name:
+            return obj.team.class_name.name
+        return '-'
     
     @admin.display(description='Año')
     def display_year(self, obj):
-        class_student = obj.team.class_name 
-        return class_student.year
+        if obj.team and obj.team.class_name:
+            return obj.team.class_name.year
+        return '-'
     
     @admin.display(description='Semestre')
     def display_stage(self, obj):
-        class_student = obj.team.class_name 
-        return class_student.get_stage_display()
+        if obj.team and obj.team.class_name:
+            return obj.team.class_name.get_stage_display()
+        return '-'
     
    
 @admin.register(Attendance)
