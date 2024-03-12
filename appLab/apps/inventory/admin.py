@@ -12,7 +12,7 @@ class GivesItemsInline(admin.TabularInline):
         
 class GivesTotalAdmin(admin.ModelAdmin):
     form = GivesForm
-    list_display = ['student', 'get_gives', 'date_out', 'date_back', 'is_give', 'is_back', 'get_status']
+    list_display = ['get_gives', 'date_out', 'date_back', 'is_give', 'is_back', 'get_status']
     filter_horizontal = ['items',]
 
 

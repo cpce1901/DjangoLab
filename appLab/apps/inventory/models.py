@@ -16,7 +16,6 @@ class GivesItems(models.Model):
 
 
 class GivesTotal(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Estudiante")
     items = models.ManyToManyField(GivesItems, verbose_name="Items", blank=True)
     date_out = models.DateField('Fecha de prestamos', auto_now_add = True)
     date_back = models.DateField('Fecha de devolución')
