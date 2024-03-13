@@ -3,8 +3,6 @@ from django.db import models
 # Create your models here.
 class Categories(models.Model):
     name = models.CharField('Categoria', max_length=64)
-    created = models.DateTimeField('Created', auto_now_add = True)
-    updated = models.DateTimeField('Updated', auto_now = True)
 
     class Meta():
         verbose_name = "Categoria"
@@ -15,12 +13,13 @@ class Categories(models.Model):
     
     
 class Materials(models.Model):
-    category = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Categoria')
+    category = models.ForeignKey(Categories, on_delete=models.SET_NULL, verbose_name='Categoria', null=True, blank=True)
     code = models.CharField('Code', max_length=32, unique=True)
     item = models.CharField('Item', max_length=128, unique=True)
     description = models.CharField('Description', max_length=512)
     stock = models.SmallIntegerField('Stock')
     enabled = models.BooleanField('Disponible', default=True)
+    details = models.CharField('Detalles', max_length=128, null=True, blank=True)
 
     class Meta():
         verbose_name = "Material"

@@ -104,8 +104,6 @@ class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     display_teams.short_description = 'Equipos'
 
 
-
-
 @admin.register(Teams)
 class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TeamsResource    
@@ -146,7 +144,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
-    list_display = ('display_full_name', 'id', 'rut', 'email', 'display_class', 'display_year', 'display_stage', 'display_team')
+    list_display = ('display_full_name', 'id', 'rut', 'email', 'display_code', 'display_class', 'display_year', 'display_stage', 'display_team')
     search_fields = ('name', 'last_name', 'team__class_name__year')
     ordering = ('name', )
    
@@ -190,6 +188,14 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(equipo.class_name.get_stage_display())
+        return ", ".join(nombres_asignaturas)
+    
+    @admin.display(description='Code')
+    def display_code(self, obj):
+        equipos_del_estudiante = obj.teams_set.all()
+        nombres_asignaturas = []
+        for equipo in equipos_del_estudiante:
+            nombres_asignaturas.append(equipo.class_name.code)
         return ", ".join(nombres_asignaturas)
        
 
