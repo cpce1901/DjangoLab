@@ -1,10 +1,10 @@
-from django.views.generic import FormView
+from django.views.generic import FormView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Students, Attendance
-from .form import AttendanceForm, StudentFoundForm
-from datetime import datetime, time, timedelta
+from .form import AttendanceForm, StudentFoundForm, StudentCreateForm
+from datetime import datetime, timedelta
 
 
 # Create your views here.
@@ -93,6 +93,36 @@ class AttendanceFormView(FormView):
 
             return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': student_id}) + "?ok")
         
-        
 
-    
+class StudentsCreateView(FormView):
+    template_name = 'attendance/studentAdd.html'
+    form_class = StudentCreateForm
+    success_url = reverse_lazy("attendance_app:student-add")
+
+    def form_valid(self, form):
+        name = form.cleaned_data["name"]
+        last_name = form.cleaned_data["last_name"]
+        rut = form.cleaned_data["rut"]
+        email = form.cleaned_data["email"]
+
+        try:
+            new_student = Students(name=name, last_name=last_name, rut=rut, email=email)
+            new_student.save()
+
+            messages.success(
+            self.request,
+            f"Alumno: {name} ingresado con exito."
+            )
+
+            return redirect(reverse_lazy("attendance_app:student-add"))
+
+        except:
+
+            messages.error(
+            self.request,
+            f"No se ha podiso realizar el ingreso."
+            )
+
+            return self.form_invalid(form)
+
+        

@@ -76,8 +76,8 @@ class Classes(models.Model):
 
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
-    class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name')
-    students = models.ManyToManyField(Students, verbose_name='Estudiantes')
+    class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name', null=True, blank=True)
+    students = models.ManyToManyField(Students, verbose_name='Estudiantes', related_name='students_team')
     
     class Meta():
         verbose_name = "Equipo"

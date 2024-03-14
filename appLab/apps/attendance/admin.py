@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from import_export.resources import ModelResource
+from import_export.resources import ModelResource, Field
+from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from .models import Attendance, Students, Classes, Teams, Schools
 from .models import Students, Teams, Classes
-from django.db.models import Q
+from django.db import models
 
 # Resources
 class AttendanceResource(ModelResource):
@@ -36,11 +37,21 @@ class StudentsResource(ModelResource):
 
 
 class TeamsResource(ModelResource):
+    students = Field(column_name='students', attribute='students',widget=ManyToManyWidget(Students, field='id', separator=','))
+    class_name = Field(column_name='class_name', attribute='class_name', widget=ForeignKeyWidget(Classes, field='id'))
+
+    def before_import_row(self, row, **kwargs):
+        team_id = row['id']
+        students_ids = [int(sid) for sid in row.get("students", "").split(",") if sid.strip()]
+        instance, created = Teams.objects.get_or_create(id=team_id, defaults={'id': team_id})
+        if created:
+            instance.students.add(*students_ids)
+ 
+
     class Meta:
         model = Teams
-        use_bulk = True
         batch_size = 500
-
+      
 
 # Inlines
 class ClassesIline(admin.TabularInline):
@@ -81,7 +92,7 @@ class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     '''
 
     resource_class = ClassesResource
-    list_display = ('display_school_code', 'stage', 'year', 'code', 'name', 'teacher', 'display_teams')
+    list_display = ('display_school_code', 'stage', 'year', 'code', 'name','teacher', 'display_teams')
     search_fields = ('school__name', 'year')
     list_filter = ('year', 'stage', 'code')
     inlines = (TeamsInline, )
@@ -144,8 +155,9 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
-    list_display = ('display_full_name', 'id', 'rut', 'email', 'display_code', 'display_class', 'display_year', 'display_stage', 'display_team')
-    search_fields = ('name', 'last_name', 'team__class_name__year')
+    list_display = ('display_full_name', 'rut', 'email', 'display_code', 'display_class', 'display_year', 'display_stage', 'display_team')
+    list_filter = ('students_team__class_name__school__code', 'students_team__class_name__code')
+    search_fields = ('name', 'last_name', 'rut', 'email')
     ordering = ('name', )
    
     @admin.display(description='Nombre completo')
@@ -156,7 +168,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     
     @admin.display(description='Grupo')
     def display_team(self, obj):
-        equipos_del_estudiante = obj.teams_set.all()
+        equipos_del_estudiante = obj.students_team.all()
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(equipo.name)
@@ -165,7 +177,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 
     @admin.display(description='Asignatura')
     def display_class(self, obj):
-        equipos_del_estudiante = obj.teams_set.all()
+        equipos_del_estudiante = obj.students_team.all()
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(equipo.class_name.name)
@@ -174,8 +186,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     
     @admin.display(description='Año')
     def display_year(self, obj):
-        equipos_del_estudiante = obj.teams_set.all()
-        print(equipos_del_estudiante)
+        equipos_del_estudiante = obj.students_team.all()
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(str(equipo.class_name.year))
@@ -184,7 +195,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     
     @admin.display(description='Semestre')
     def display_stage(self, obj):
-        equipos_del_estudiante = obj.teams_set.all()
+        equipos_del_estudiante = obj.students_team.all()
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(equipo.class_name.get_stage_display())
@@ -192,19 +203,24 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     
     @admin.display(description='Code')
     def display_code(self, obj):
-        equipos_del_estudiante = obj.teams_set.all()
+        equipos_del_estudiante = obj.students_team.all()
         nombres_asignaturas = []
         for equipo in equipos_del_estudiante:
             nombres_asignaturas.append(equipo.class_name.code)
         return ", ".join(nombres_asignaturas)
        
 
-
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
-    list_display = ['student', 'date_in', 'time_inside']
-    search_fields =['student__name', 'student__last_name']
+    list_display = ('student', 'date_in', 'time_inside')
+    list_filter = (
+        'student__students_team__class_name__school__code', 
+        'student__students_team__class_name__name', 
+        'student__students_team__class_name__year', 
+        'student__students_team__class_name__stage'
+        )
+    search_fields =('student__name', 'student__last_name')
 
     def student(self, obj):
         return obj

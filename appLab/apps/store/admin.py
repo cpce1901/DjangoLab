@@ -17,6 +17,7 @@ class CategoriesResource(ModelResource):
         use_bulk = True
         batch_size = 500
 
+
 class MaterialsResource(ModelResource):
     class Meta:
         model = Materials
@@ -29,6 +30,7 @@ class CategoriesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = CategoriesResource
     list_display = ['name']
     inlines = (MaterialsInline, )
+
 
 @admin.register(Materials)
 class MaterialsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
