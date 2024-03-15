@@ -1,8 +1,9 @@
-from django.views.generic import FormView, CreateView
+from django.db.models.query import QuerySet
+from django.views.generic import FormView, ListView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import Students, Attendance
+from .models import Students, Attendance, Schools, Classes, Teams
 from .form import AttendanceForm, StudentFoundForm, StudentCreateForm
 from datetime import datetime, timedelta
 
@@ -93,6 +94,34 @@ class AttendanceFormView(FormView):
 
             return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': student_id}) + "?ok")
         
+
+class SchoolListView(ListView):
+    template_name = 'attendance/schoolList.html'
+    model = Schools
+    context_object_name = 'schools'
+
+
+class ClassesListView(ListView):
+    template_name = 'attendance/classesList.html'
+    model = Classes
+    context_object_name = 'classes'
+
+    def get_queryset(self):
+        id = self.kwargs.get('school')
+        classes_name = self.model.objects.filter(school_id=id)
+        return classes_name
+
+
+class TeamsListView(ListView):
+    template_name = 'attendance/teamsList.html'
+    model = Teams
+    context_object_name = 'teams'
+
+    def get_queryset(self):
+        id = self.kwargs.get('team')
+        teams_name = self.model.objects.filter(class_name_id=id)
+        return teams_name
+    
 
 class StudentsCreateView(FormView):
     template_name = 'attendance/studentAdd.html'

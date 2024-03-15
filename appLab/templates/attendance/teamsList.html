@@ -1,0 +1,102 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+<!-- Carga title page -->
+{% block title %}
+Crear Estudiante - LAB4.0
+{% endblock title %}
+
+<!-- Carga content page -->
+{% block content %}
+
+<main class="container-fluid h-screen flex flex-col justify-center items-center gap-12">
+
+    <h1 class="font-exo text-6xl text-center">Escuelas</h1>
+
+    <div class="text-center">
+        <p class="font-exo text-lg">Porfavor selecciona un escuela</p>
+    </div>
+
+    <div>
+        <ul>
+            
+            {% if teams %}
+                                
+            {% for team in teams %}
+            <li>{{ team.name }}</li>
+
+            <div>
+                <ul>
+
+                    {% for student in team.students.all %}
+                    <li>{{ student.name }} {{ student.last_name }}</li>
+                    {% endfor %}
+
+                    <a href="{% url 'attendance_app:student-add' team.id %}">Agregar</a>
+                    <a href="">Eliminar</a>
+
+                </ul>
+            </div>
+            {% endfor %}
+
+            {% else %}
+
+            <a href="{% url 'attendance_app:team-add' %}">Crear grupo</a>
+
+            {% endif %}
+
+        </ul>
+    </div>
+
+    <div>
+        {% if messages %}
+
+        {% for message in messages %}
+
+        {% if message.tags == "success" %}
+
+        <script>
+            Swal.fire({
+                title: 'Éxito',
+                text: '{{ message }}',
+                icon: 'success',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "error" %}
+
+        <script>
+            Swal.fire({
+                title: 'Error',
+                text: '{{ message }}',
+                icon: 'error',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "info" %}
+
+        <script>
+            Swal.fire({
+                title: 'Exito',
+                text: '{{ message }}',
+                icon: 'info',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% endif %}
+
+        {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+{% endblock content %}

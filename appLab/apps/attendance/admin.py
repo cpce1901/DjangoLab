@@ -119,6 +119,7 @@ class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TeamsResource    
     list_display = ('name', 'get_class', 'get_year', 'get_stage', 'get_students') 
+    list_filter = ('class_name__school__code', 'class_name__year', 'class_name__stage')
     filter_horizontal = ('students', )
     search_fields = ('name', 'class_name__name', 'class_name__year')
 

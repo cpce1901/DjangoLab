@@ -35,7 +35,7 @@ class Students(models.Model):
      
     name = models.CharField('Nombre', max_length=32)
     last_name = models.CharField('Apellido', max_length=32)
-    rut = models.CharField('RUT', max_length=10)
+    rut = models.CharField('RUT', max_length=10, null=True, blank=True)
     email = models.EmailField('Email', null=True)
     
     class Meta():
@@ -77,7 +77,7 @@ class Classes(models.Model):
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
     class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name', null=True, blank=True)
-    students = models.ManyToManyField(Students, verbose_name='Estudiantes', related_name='students_team')
+    students = models.ManyToManyField(Students, verbose_name='Estudiantes', related_name='students_team', blank=True)
     
     class Meta():
         verbose_name = "Equipo"
