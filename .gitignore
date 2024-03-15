@@ -1,3 +1,5 @@
 /env-lab
 /_pycache_
 .sqlite3
+
+/migrations

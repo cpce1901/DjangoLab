@@ -76,6 +76,7 @@ class Classes(models.Model):
 
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
+    challenge = models.CharField('Reto', max_length=32, null=True, blank=True)
     class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name', null=True, blank=True)
     students = models.ManyToManyField(Students, verbose_name='Estudiantes', related_name='students_team', blank=True)
     
