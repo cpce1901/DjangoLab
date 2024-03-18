@@ -15,8 +15,9 @@ class StudentFoundFormView(FormView):
     success_url = reverse_lazy("attendance_app:attendance")
 
     def form_valid(self, form):
-        rut = form.cleaned_data["rut"]
-        student = Students.objects.filter(rut = rut).first()              
+        user = form.cleaned_data["email"]
+        email = user + '@correo.uss.cl'
+        student = Students.objects.filter(email=email).first()              
  
         if student:
             id_student = student.id
@@ -52,7 +53,7 @@ class StudentFoundFormView(FormView):
         else:            
             messages.error(
                 self.request,
-                "El RUT no coincide con ningún estudiante. Inténtalo otra vez."
+                "El usuario no coincide con ningún estudiante. Inténtalo otra vez."
             )
             return self.form_invalid(form)
             

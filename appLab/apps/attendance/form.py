@@ -2,13 +2,13 @@ from django import forms
 from .models import Students
 
 class StudentFoundForm(forms.Form):
-    rut = forms.CharField(
-        label="RUT",
+    email = forms.CharField(
+        label="EMAIL",
         max_length=10,
         required=True,
         widget=forms.TextInput(attrs={
-            "id": "rut",
-            "placeholder": "RUT sin puntos ni guión.",
+            "id": "email",
+            "placeholder": "Ingresa tu usuario",
             "class": "text-input",
         }),
     )

@@ -62,14 +62,13 @@ class Students(models.Model):
      
     name = models.CharField('Nombre', max_length=32)
     last_name = models.CharField('Apellido', max_length=32)
-    rut = models.CharField('RUT', max_length=10, null=True, blank=True)
     email = models.EmailField('Email', null=True)
     class_name = models.ManyToManyField(Classes, verbose_name='Asignatura', related_name='class_student', blank=True)
     
     class Meta():
         verbose_name = "Estudiante"
         verbose_name_plural = "Estudiantes"
-        unique_together= ['name', 'last_name', 'rut']
+        unique_together= ['name', 'last_name', 'email']
 
     def __str__(self):
         return f"{self.name} {self.last_name}"

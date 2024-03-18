@@ -164,7 +164,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
-    list_display = ('display_full_name', 'rut', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team')
+    list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team')
     list_filter = ('class_name__school__code', 'class_name__code')
     search_fields = ('name', 'last_name')
     filter_vertical = ('class_name',)
