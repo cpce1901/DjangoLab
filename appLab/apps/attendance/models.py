@@ -26,27 +26,6 @@ class Schools(models.Model):
         return f"{self.name}"
 
 
-class Students(models.Model):
-
-    '''
-    Modelo de estudiante
-
-    '''
-     
-    name = models.CharField('Nombre', max_length=32)
-    last_name = models.CharField('Apellido', max_length=32)
-    rut = models.CharField('RUT', max_length=10, null=True, blank=True)
-    email = models.EmailField('Email', null=True)
-    
-    class Meta():
-        verbose_name = "Estudiante"
-        verbose_name_plural = "Estudiantes"
-        unique_together= ['name', 'last_name', 'rut']
-
-    def __str__(self):
-        return f"{self.name} {self.last_name}"
-
-
 class Classes(models.Model):
 
     '''
@@ -64,7 +43,7 @@ class Classes(models.Model):
     year = models.IntegerField('Año')
     stage = models.CharField('Semestre', max_length=1, choices=STAGE_CHOICES)
     teacher = models.CharField('Profesor', max_length=32, null=True, blank=True)
-    school = models.ForeignKey(Schools, on_delete=models.CASCADE, verbose_name='Carrera', related_name='school')
+    school = models.ForeignKey(Schools, on_delete=models.SET_NULL, verbose_name='Carrera', related_name='school', null=True, blank=True)
 
     class Meta():
         verbose_name = "Asignatura"
@@ -74,19 +53,41 @@ class Classes(models.Model):
         return f"{self.school.code} | {self.name} | {self.get_stage_display()} Semestre | {self.year}"
 
 
+class Students(models.Model):
+
+    '''
+    Modelo de estudiante
+
+    '''
+     
+    name = models.CharField('Nombre', max_length=32)
+    last_name = models.CharField('Apellido', max_length=32)
+    rut = models.CharField('RUT', max_length=10, null=True, blank=True)
+    email = models.EmailField('Email', null=True)
+    class_name = models.ManyToManyField(Classes, verbose_name='Asignatura', related_name='class_student', blank=True)
+    
+    class Meta():
+        verbose_name = "Estudiante"
+        verbose_name_plural = "Estudiantes"
+        unique_together= ['name', 'last_name', 'rut']
+
+    def __str__(self):
+        return f"{self.name} {self.last_name}"
+
+
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
     challenge = models.CharField('Reto', max_length=32, null=True, blank=True)
-    class_name = models.ForeignKey(Classes, on_delete=models.CASCADE, verbose_name='Asignatura', related_name='class_name', null=True, blank=True)
-    students = models.ManyToManyField(Students, verbose_name='Estudiantes', related_name='students_team', blank=True)
-    
+    class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_team', null=True, blank=True)
+    team_name = models.ManyToManyField(Students, verbose_name='Equipo', related_name='team_student', blank=True)
+
     class Meta():
         verbose_name = "Equipo"
         verbose_name_plural = "Equipos"
         
     def __str__(self):
         return f"{self.name} | {self.class_name.name} | {self.class_name.year}"
-    
+
 
 class Attendance(models.Model):
     
