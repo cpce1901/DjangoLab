@@ -137,7 +137,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 
     @admin.display(description='Asignatura')
     def display_class_name(self, obj):
-        return obj.class_name.name
+        return f'{obj.class_name.school.code} | {obj.class_name.name}'
     
     @admin.display(description='Año')
     def display_class_name_year(self, obj):
