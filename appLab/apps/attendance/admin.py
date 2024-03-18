@@ -172,7 +172,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     @admin.display(description='Nombre completo')
     def display_full_name(self, obj):
         return f'{obj.name} {obj.last_name}'
-    
+
     @admin.display(description='Asignatura')
     def display_class_name(self, obj):
         classes = obj.class_name.all()
@@ -180,7 +180,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         if classes:
             output = '<ul>'
             for class_name in classes:
-                output += f'<li>{class_name.name}</li>'
+                output += f'<li>{class_name.school.code} | {class_name.name}</li>'
             output += '</ul>'
             return format_html(output)
         else:
@@ -229,6 +229,16 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
+    list_display = ('display_student_name', 'date_in', 'time_inside')
+    list_filter = ('student__class_name__year', 'student__class_name__stage', 'student__class_name__school__code')
+
+    @admin.display(description='Estudiante')
+    def display_student_name(self, obj):
+        return f'{obj.student.name} {obj.student.last_name}'
+    
+   
+    
+
    
 
    

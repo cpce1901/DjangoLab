@@ -95,7 +95,7 @@ class Attendance(models.Model):
 
     '''
 
-    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name='Estudiante')
+    student = models.ForeignKey(Students, on_delete=models.SET_NULL, verbose_name='Estudiante', null=True)
     date_in = models.DateTimeField('Ingreso', auto_now_add = True)
     time_inside = models.TimeField('Tiempo estimado de permanencia')
 

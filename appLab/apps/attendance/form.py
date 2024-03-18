@@ -3,7 +3,7 @@ from .models import Students
 
 class StudentFoundForm(forms.Form):
     email = forms.CharField(
-        label="EMAIL",
+        label="USUARIO",
         max_length=10,
         required=True,
         widget=forms.TextInput(attrs={

@@ -53,7 +53,7 @@ class StudentFoundFormView(FormView):
         else:            
             messages.error(
                 self.request,
-                "El usuario no coincide con ningún estudiante. Inténtalo otra vez."
+                "El usuario no coincide con ningún estudiante. Recuerda que tu usuario es la primera parte de tu correo"
             )
             return self.form_invalid(form)
             
