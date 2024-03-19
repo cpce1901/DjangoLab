@@ -56,6 +56,7 @@ class StudentFoundFormView(FormView):
                 "El usuario no coincide con ningún estudiante. Recuerda que tu usuario es la primera parte de tu correo"
             )
             return self.form_invalid(form)
+      
             
 # Vista tiempo Ingreso a Lab
 class AttendanceFormView(FormView):
@@ -94,13 +95,13 @@ class AttendanceFormView(FormView):
             attendance.save()
 
             return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': student_id}) + "?ok")
-        
+
+
 # Vista para mostrar grupos
 class TeamsView(TemplateView):
     template_name = 'attendance/admin/teamsList.html'
     
     
-
 # Vista para filtrar grupos por Nombre de estudiante
 def TeamsFilterView(request):
     name = request.GET.get('name')
