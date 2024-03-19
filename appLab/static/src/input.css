@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 .text-input{
-    @apply px-4 py-2 text-lg outline outline-1 outline-gray-200 text-gray-600 font-rale text-center
+    @apply  w-full px-4 py-2 text-lg outline outline-1 outline-gray-200 text-gray-600 font-rale 
 }
 
 
