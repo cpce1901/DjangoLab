@@ -1,10 +1,10 @@
-from django.db.models.query import QuerySet
+from django.shortcuts import render
 from django.views.generic import FormView, ListView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Students, Attendance, Schools, Classes, Teams
-from .form import AttendanceForm, StudentFoundForm, StudentCreateForm
+from .form import AttendanceForm, StudentFoundForm
 from datetime import datetime, timedelta
 
 
@@ -96,8 +96,19 @@ class AttendanceFormView(FormView):
             return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': student_id}) + "?ok")
         
 # Vista para mostrar grupos
-class TeamsView(ListView):
+class TeamsView(TemplateView):
     template_name = 'attendance/admin/teamsList.html'
-    context_object_name = 'teams'
-    model = Teams
+    
+    
+
+# Vista para filtrar grupos por Nombre de estudiante
+def TeamsFilterView(request):
+    name = request.GET.get('name')
+    teams = Teams.objects.filter(team_name__name__icontains=name)
+    template_name = 'attendance/admin/filterTeams.html'
+    return render(request, template_name, {'teams':teams})
+        
+    
+    
+    
     

@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 
     # APPS_TERCEROS
     'import_export',
+    'django_htmx',
 
     # APPS_LOCALES
     'apps.attendance',
@@ -34,6 +35,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = 'appLab.urls'

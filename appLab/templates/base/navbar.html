@@ -33,7 +33,7 @@
                             <a href="{% url 'attendance_app:student' %}" title="Navegar a electricista"
                                 class="{% if request.path == '/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300 ">Inicio</a>
                             <a href="{% url 'attendance_app:teams' %}" title="Navegar a Equipos"
-                                class="{% if request.path == '/nosotros/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Equipos</a>
+                                class="{% if request.path == '/grupos/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Equipos</a>
                         </div>
 
 
@@ -41,7 +41,7 @@
                         <!-- Boton -->
                         <div class="flex flex-col gap-5 border-t py-8 px-6 md:border-t-0 md:py-0 md:pr-0 md:pl-6">
 
-                            <a href="#"
+                            <a href="{%  url 'admin:index' %}"
                                 class="block px-6 py-2 rounded text-center text-white text-lg font-semibold transition bg-blue-500 hover:bg-blue-600">Ir
                                 a APP</a>
                             <a href="tel:+56974699573" title="llamada de teléfono"
