@@ -1,0 +1,40 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+<!-- Carga title page -->
+{% block title %}
+Crear Estudiante - LAB4.0
+{% endblock title %}
+
+<!-- Carga content page -->
+{% block content %}
+
+<main class="container mx-auto px-4 py-8">
+    <!-- Section for content -->
+    {% if teams %}
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-16">
+        {% for team in teams %}
+        <div class="border rounded-lg shadow-md bg-white p-4">
+            <h3 class="text-md font-medium mb-2">{{ team.class_name }}</h3>
+            <h4 class="text-lg font-semibold mb-4">{{ team.name }}</h4>
+            <ul>
+                {% for student in team.team_name.all %}
+                <li class="mb-1">{{ student.name }} {{ student.last_name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </section>
+    {% else %}
+    <section>
+        <!-- Aquí puedes poner un mensaje si no hay equipos -->
+        <p class="text-center text-gray-600">No hay equipos disponibles.</p>
+    </section>
+    {% endif %}
+</main>
+
+
+{% endblock content %}

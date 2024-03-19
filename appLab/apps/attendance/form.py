@@ -1,10 +1,9 @@
 from django import forms
-from .models import Students
 
 class StudentFoundForm(forms.Form):
     email = forms.CharField(
         label="USUARIO",
-        max_length=10,
+        max_length=15,
         required=True,
         widget=forms.TextInput(attrs={
             "id": "email",

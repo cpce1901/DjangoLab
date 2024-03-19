@@ -1,5 +1,5 @@
 from django.db.models.query import QuerySet
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -8,7 +8,7 @@ from .form import AttendanceForm, StudentFoundForm, StudentCreateForm
 from datetime import datetime, timedelta
 
 
-# Create your views here.
+# Vista Inicial Ingreso a Lab
 class StudentFoundFormView(FormView):
     template_name = 'attendance/studentFoundForm.html'
     form_class = StudentFoundForm
@@ -57,7 +57,7 @@ class StudentFoundFormView(FormView):
             )
             return self.form_invalid(form)
             
-
+# Vista tiempo Ingreso a Lab
 class AttendanceFormView(FormView):
     template_name = 'attendance/attendanceForm.html'
     form_class = AttendanceForm
@@ -95,64 +95,9 @@ class AttendanceFormView(FormView):
 
             return redirect(reverse_lazy("attendance_app:attendance", kwargs={'student': student_id}) + "?ok")
         
-
-class SchoolListView(ListView):
-    template_name = 'attendance/schoolList.html'
-    model = Schools
-    context_object_name = 'schools'
-
-
-class ClassesListView(ListView):
-    template_name = 'attendance/classesList.html'
-    model = Classes
-    context_object_name = 'classes'
-
-    def get_queryset(self):
-        id = self.kwargs.get('school')
-        classes_name = self.model.objects.filter(school_id=id)
-        return classes_name
-
-
-class TeamsListView(ListView):
-    template_name = 'attendance/teamsList.html'
-    model = Teams
+# Vista para mostrar grupos
+class TeamsView(ListView):
+    template_name = 'attendance/admin/teamsList.html'
     context_object_name = 'teams'
-
-    def get_queryset(self):
-        id = self.kwargs.get('team')
-        teams_name = self.model.objects.filter(class_name_id=id)
-        return teams_name
+    model = Teams
     
-
-class StudentsCreateView(FormView):
-    template_name = 'attendance/studentAdd.html'
-    form_class = StudentCreateForm
-    success_url = reverse_lazy("attendance_app:student-add")
-
-    def form_valid(self, form):
-        name = form.cleaned_data["name"]
-        last_name = form.cleaned_data["last_name"]
-        rut = form.cleaned_data["rut"]
-        email = form.cleaned_data["email"]
-
-        try:
-            new_student = Students(name=name, last_name=last_name, rut=rut, email=email)
-            new_student.save()
-
-            messages.success(
-            self.request,
-            f"Alumno: {name} ingresado con exito."
-            )
-
-            return redirect(reverse_lazy("attendance_app:student-add"))
-
-        except:
-
-            messages.error(
-            self.request,
-            f"No se ha podiso realizar el ingreso."
-            )
-
-            return self.form_invalid(form)
-
-        
