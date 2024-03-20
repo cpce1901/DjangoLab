@@ -1,4 +1,3 @@
-
 <!-- Section for content -->
 {% if teams %}
 <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-20">
@@ -14,10 +13,29 @@
     </div>
     {% endfor %}
 </section>
+
+{% elif students %}
+<section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-20">
+    {% for student in students %}
+    <div class=" border rounded-lg shadow-md bg-white p-8">
+        {% for class in student.class_name.all %}
+        <h3 class="text-md font-medium mb-2">{{ class }}</h3>
+        {% endfor %}
+        <h4 class="text-lg font-semibold mb-4">Sin grupo</h4>
+        <ul>
+            <h3 class="text-md font-medium mb-2">{{ student.name }} {{ student.last_name }}</h3>
+            
+        </ul>
+    </div>
+    {% endfor %}
+</section>
+
 {% else %}
+
 <section>
     <!-- Aquí puedes poner un mensaje si no hay equipos -->
-    <p class="text-center text-gray-600"></p>
+    <p class="text-center text-gray-600">No existen estudiantes con la información.</p>
 </section>
+
+
 {% endif %}
-    

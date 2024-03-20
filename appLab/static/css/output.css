@@ -689,6 +689,10 @@ video {
   width: 100%;
 }
 
+.w-6\/12{
+  width: 50%;
+}
+
 .translate-x-\[-100\%\]{
   --tw-translate-x: -100%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -801,6 +805,14 @@ video {
 
 .p-4{
   padding: 1rem;
+}
+
+.p-6{
+  padding: 1.5rem;
+}
+
+.p-8{
+  padding: 2rem;
 }
 
 .px-10{

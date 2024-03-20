@@ -100,14 +100,30 @@ class AttendanceFormView(FormView):
 # Vista para mostrar grupos
 class TeamsView(TemplateView):
     template_name = 'attendance/admin/teamsList.html'
+
+    
+    def get_context_data(self, **kwargs):
+        context = super(TeamsView, self).get_context_data(**kwargs)
+        context['teams'] = Teams.objects.all()
+        return context
+    
     
     
 # Vista para filtrar grupos por Nombre de estudiante
 def TeamsFilterView(request):
+    teams, students = None, None
     name = request.GET.get('name')
     teams = Teams.objects.filter(team_name__name__icontains=name)
+    if len(teams) == 0:
+        students = Students.objects.filter(name__icontains=name)
+
     template_name = 'attendance/admin/filterTeams.html'
-    return render(request, template_name, {'teams':teams})
+    context={
+        'teams':teams,
+        'students': students
+        }
+    
+    return render(request, template_name, context)
         
     
     
