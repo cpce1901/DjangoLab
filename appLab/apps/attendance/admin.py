@@ -7,16 +7,6 @@ from .models import Attendance, Students, Classes, Teams, Schools
 from .models import Students, Teams, Classes
 
 
-"""team_name = Field(column_name='students', attribute='students',widget=ManyToManyWidget(Students, field='id', separator=','))
-class_name = Field(column_name='class_name', attribute='class_name', widget=ForeignKeyWidget(Classes, field='id'))
-
-    def before_import_row(self, row, **kwargs):
-        team_id = row['id']
-        students_ids = [int(sid) for sid in row.get("students", "").split(",") if sid.strip()]
-        instance, created = Teams.objects.get_or_create(id=team_id, defaults={'id': team_id})
-        if created:
-            instance.students.add(*students_ids)"""
-
 # Resources
 class AttendanceResource(ModelResource):
     class Meta:
