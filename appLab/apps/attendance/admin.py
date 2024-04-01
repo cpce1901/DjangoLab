@@ -229,6 +229,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
+    search_fields = ('display_student_name',)
     list_display = ('display_student_name', 'date_in', 'time_inside')
     list_filter = ('student__class_name__year', 'student__class_name__stage', 'student__class_name__school__code')
 
