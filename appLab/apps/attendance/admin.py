@@ -3,8 +3,8 @@ from django.utils.html import format_html
 from import_export.resources import ModelResource, Field
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
-from .models import Attendance, Students, Classes, Teams, Schools
-from .models import Students, Teams, Classes
+from .models import Attendance, Students, Classes, Teams, Schools, TecnoEnabledResults, TopicEnabled
+
 
 
 # Resources
@@ -67,6 +67,11 @@ class TeamsInline(admin.TabularInline):
 
 class StudentInline(admin.TabularInline):
     model = Students
+    extra = 0
+
+
+class TecnoEnabledResultInline(admin.TabularInline):
+    model = TecnoEnabledResults
     extra = 0
 
 
@@ -154,7 +159,8 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
-    list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team')
+    inlines = (TecnoEnabledResultInline,)
+    list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
     list_filter = ('class_name__school__code', 'class_name__code')
     search_fields = ('name', 'last_name')
     filter_vertical = ('class_name',)
@@ -214,6 +220,21 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
             return format_html(output)
         else:
             return ''
+        
+    @admin.display(description='Todo habilitado')
+    def display_tecno_enabled(self, obj):
+        tecno_enabled = obj.student_enabled.all()
+
+        if not tecno_enabled:
+            return '❌'  
+    
+        for student in tecno_enabled:
+            if not student.status:
+                return '❌'  
+    
+        return '✅'  
+       
+
     
 
 @admin.register(Attendance)
@@ -228,7 +249,31 @@ class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         return f'{obj.student.name} {obj.student.last_name}'
     
    
+@admin.register(TecnoEnabledResults)
+class TecnoEnabledAdmin(admin.ModelAdmin):
+    list_display = ('display_student_name', 'display_topic', 'display_score_result', 'status')
+    readonly_fields = ('status', )
+
+
+    @admin.display(description='Estudiante')
+    def display_student_name(self, obj):
+        return f'{obj.student.name} {obj.student.last_name}'
     
+    @admin.display(description='Habilitador')
+    def display_topic(self, obj):
+        return f'{obj.topic.name}'
+    
+    @admin.display(description='Resultado')
+    def display_score_result(self, obj):
+        return f'{obj.score_result if obj.score_result else 0}/{obj.topic.score}'
+
+
+
+@admin.register(TopicEnabled)
+class TecnoEnabledAdmin(admin.ModelAdmin):
+    list_display = ('name', 'score')
+
+  
 
    
 

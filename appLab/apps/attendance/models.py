@@ -74,9 +74,46 @@ class Students(models.Model):
         return f"{self.name} {self.last_name}"
 
 
+class TopicEnabled(models.Model):
+    name = models.CharField('Nombre', max_length=32)
+    score = models.SmallIntegerField('Puntaje', null=True, blank=True)
+
+    class Meta():
+        verbose_name = "Tipo Habilitador"
+        verbose_name_plural = "Tipos Habilitador"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class TecnoEnabledResults(models.Model):
+    student = models.ForeignKey(Students, on_delete=models.SET_NULL, verbose_name='Estudiante', related_name='student_enabled', null=True, blank=True)
+    topic = models.ForeignKey(TopicEnabled, on_delete=models.SET_NULL, verbose_name='Nombre habilitador', related_name='topic_enabled', null=True, blank=True)
+    score_result = models.SmallIntegerField('Puntaje obtenido', null=True, blank=True)
+    status = models.BooleanField('Estado')
+    
+    class Meta():
+        verbose_name = "Resultado Habilitadores"
+        verbose_name_plural = "Resultados Habilitadores"
+        unique_together = ['student', 'topic']
+
+    def save(self, *args, **kwargs):
+        if self.score_result is not None:
+            if self.score_result >= 60:
+                self.status = True
+        else:
+            self.status = False
+
+        super(TecnoEnabledResults, self).save(*args, **kwargs)
+        
+
+    def __str__(self):
+        return f"{self.topic.name} {self.score_result} {self.status}"
+
+
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
-    challenge = models.CharField('Reto', max_length=32, null=True, blank=True)
+    challenge = models.CharField('Reto', max_length=128, null=True, blank=True)
     class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_team', null=True, blank=True)
     team_name = models.ManyToManyField(Students, verbose_name='Equipo', related_name='team_student', blank=True)
 
