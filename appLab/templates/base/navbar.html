@@ -34,6 +34,8 @@
                                 class="{% if request.path == '/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300 ">Inicio</a>
                             <a href="{% url 'attendance_app:teams' %}" title="Navegar a Equipos"
                                 class="{% if request.path == '/grupos/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Equipos</a>
+                            <a href="{% url 'attendance_app:students' %}" title="Navegar a Equipos"
+                                class="{% if request.path == '/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Estudiantes</a>
                         </div>
 
 

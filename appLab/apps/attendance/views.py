@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import FormView,TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import Students, Attendance, Schools, Classes, Teams
+from .models import Students, Attendance, Teams
 from .form import AttendanceForm, StudentFoundForm
 from datetime import datetime, timedelta
 
@@ -107,23 +107,13 @@ class TeamsView(TemplateView):
         context['teams'] = Teams.objects.all()
         return context
     
-    
-    
-# Vista para filtrar grupos por Nombre de estudiante
-def TeamsFilterView(request):
-    teams, students = None, None
-    name = request.GET.get('name')
-    teams = Teams.objects.filter(team_name__name__icontains=name)
-    if len(teams) == 0:
-        students = Students.objects.filter(name__icontains=name)
 
-    template_name = 'attendance/admin/filterTeams.html'
-    context={
-        'teams':teams,
-        'students': students
-        }
+# Vista para mostrar grupos
+class StudentsView(TemplateView):
+    template_name = 'attendance/admin/studentDetail.html'
+
     
-    return render(request, template_name, context)
+
         
     
     

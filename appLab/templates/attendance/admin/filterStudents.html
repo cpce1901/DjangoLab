@@ -1,0 +1,48 @@
+{% if student %}
+    {% with all_status_true=True %}
+        {% for tecnoEnabled in student.student_enabled.all %}
+            {% if not tecnoEnabled.status %}
+                {% with all_status_true=False %}{% endwith %}
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+
+    <div class="outline outline-1 outline-gray-100 bg-gradient-to-br from-white to-gray-100 rounded-lg p-6 mx-auto max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl {% if all_status_true %}shadow-[rgba(7,_65,_210,_0.15)_10px_90px_300px]{% else %}shadow-[rgba(255,_95,_30,_0.15)_10px_90px_300px]{% endif %}">
+        <h3 class="text-xl font-semibold mb-4 text-black text-center">{{ student.name }} {{ student.last_name }}</h3>
+
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold mb-2 text-blue-500">Clases</h4>
+            <ul class="list-disc list-inside">
+                {% for class in student.class_name.all %}
+                <li class="text-md font-medium mb-2 text-black">{{ class }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold mb-2 text-blue-500">Equipos</h4>
+            <ul class="list-disc list-inside">
+                {% for team in student.team_student.all %}
+                <li class="mb-1 text-black">{{ team.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="text-lg font-semibold mb-2 text-blue-500">Habilitadores</h4>
+            <ul class="divide-y divide-blue-700">
+                {% for tecnoEnabled in student.student_enabled.all %}
+                <li class="flex justify-between items-center py-2">
+                    <span class="text-md text-black">{{ tecnoEnabled.topic.name }}</span>
+                    <span class="text-md text-black">{% if tecnoEnabled.score_result == None %}Aun no rendido{% else %}{{ tecnoEnabled.score_result }}{% endif %}</span>
+                    <input type="checkbox" class="ml-2 h-4 w-4 text-blue-600 pointer-events-none" {% if tecnoEnabled.status %} checked {% endif %}>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="bg-gray-800 p-4 rounded-md shadow-md mx-auto max-w-md">
+        <p class="text-center text-gray-300 font-semibold">¡Oops! No se encontraron estudiantes.</p>
+    </div>
+{% endif %}

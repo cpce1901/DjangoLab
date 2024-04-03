@@ -1,0 +1,43 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+<!-- Carga title page -->
+{% block title %}
+Buscar Estudiante - LAB4.0
+{% endblock title %}
+
+<!-- Carga content page -->
+{% block content %}
+
+<main class="container mx-auto px-4 pt-32">
+    <!-- Section searching -->
+    <section class="flex justify-center mb-16">
+
+        <div class="w-8/12 flex items-center gap-6" >
+    
+            <div class="w-full flex items-center gap-5">
+                <label class="font-exo text-base font-semibold text-gray-500">Buscador</label>
+                <input 
+                    class="text-input" 
+                    type="text" 
+                    name="name" 
+                    placeholder="Ingresa tu nombre"
+                    hx-target="#response" 
+                    hx-trigger="keyup changed delay:500ms" 
+                    hx-get="{% url 'attendance_app:students-filter' %}">
+            </div>
+
+        </div>
+
+    </section>
+
+    
+    <div id="response">
+        {% include 'attendance/admin/filterTeams.html' %}
+    </div>
+</main>
+
+{% endblock content %}
