@@ -257,7 +257,7 @@ class TecnoEnabledAdmin(admin.ModelAdmin):
 
     @admin.display(description='Estudiante')
     def display_student_name(self, obj):
-        return f'{obj.student.name} {obj.student.last_name}'
+        return f'{obj.student.name if obj.student else None} {obj.student.last_name if obj.student else None}'
     
     @admin.display(description='Habilitador')
     def display_topic(self, obj):

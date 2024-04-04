@@ -1,45 +1,70 @@
-{% if student %}
-    {% with all_status_true=True %}
-        {% for tecnoEnabled in student.student_enabled.all %}
-            {% if not tecnoEnabled.status %}
-                {% with all_status_true=False %}{% endwith %}
-            {% endif %}
+{% if students %}
+    <div class="flex flex-wrap justify-center gap-4">
+        {% for student in students %}
+            <div class="outline outline-1 outline-gray-100 bg-gradient-to-br from-white to-gray-100 rounded-lg p-4 mx-auto max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl shadow-[rgba(7,_65,_210,_0.15)_1px_9px_30px]">
+                
+                <h3 class="text-xl font-semibold text-black text-center">{{ student.name }} {{ student.last_name }}</h3>
+                <h5 class="text-sm text-center text-gray-600">{{ student.email }}</h5>
+
+                <div class="mb-4">
+                    <h4 class="text-lg font-semibold mb-2 text-blue-500">Clases</h4>
+                    <ul class="list-disc list-inside">
+                        {% for class in student.class_name.all %}
+                            <li class="text-md font-medium mb-2 text-black">{{ class }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="text-lg font-semibold mb-2 text-blue-500">Equipos</h4>
+                    <ul class="list-disc list-inside">
+                        {% for team in student.team_student.all %}
+                            <li class="mb-1 text-black">{{ team.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div>
+                    <table class="w-full divide-y divide-blue-700">
+                        <thead>
+                            <tr class="bg-slate-100">
+                                <th class="px-4 py-2 text-left">Habilitador</th>
+                                <th class="px-4 py-2">Puntaje Obtenido</th>
+                                <th class="px-4 py-2">Habilitado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tecnoEnabled in student.student_enabled.all %}
+
+                                <tr class="py-2">
+                                    <td class="px-4 py-2">{{ tecnoEnabled.topic.name }}</td>
+                                    <td class="px-4 py-2 text-center">
+                                        {% if tecnoEnabled.score_result %}
+                                            {{ tecnoEnabled.score_result}}/{{ tecnoEnabled.topic.score }} 
+                                        {% else %} 
+                                            Aún no rendido
+                                        {% endif %}
+                                        </td>
+                                    <td class="px-4 py-2 text-center">
+                                        <input type="checkbox" class="h-4 w-4 text-blue-600 pointer-events-none" {% if tecnoEnabled.status %} checked {% endif %}>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end items-end">
+                    {% if student.status_all %}
+                        <p class="text-green-500 font-semibold mt-2">Habilitado</p>
+                    {% elif student.status_all == False %}
+                        <p class="text-red-500 font-semibold mt-2">No habilitado</p>
+                    {% else %}
+                    <p class="text-yellow-500 font-semibold mt-2">Sin habilitadores</p>
+                    {% endif %}
+                </div>
+            </div>
         {% endfor %}
-    {% endwith %}
-
-    <div class="outline outline-1 outline-gray-100 bg-gradient-to-br from-white to-gray-100 rounded-lg p-6 mx-auto max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl {% if all_status_true %}shadow-[rgba(7,_65,_210,_0.15)_10px_90px_300px]{% else %}shadow-[rgba(255,_95,_30,_0.15)_10px_90px_300px]{% endif %}">
-        <h3 class="text-xl font-semibold mb-4 text-black text-center">{{ student.name }} {{ student.last_name }}</h3>
-
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold mb-2 text-blue-500">Clases</h4>
-            <ul class="list-disc list-inside">
-                {% for class in student.class_name.all %}
-                <li class="text-md font-medium mb-2 text-black">{{ class }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold mb-2 text-blue-500">Equipos</h4>
-            <ul class="list-disc list-inside">
-                {% for team in student.team_student.all %}
-                <li class="mb-1 text-black">{{ team.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div>
-            <h4 class="text-lg font-semibold mb-2 text-blue-500">Habilitadores</h4>
-            <ul class="divide-y divide-blue-700">
-                {% for tecnoEnabled in student.student_enabled.all %}
-                <li class="flex justify-between items-center py-2">
-                    <span class="text-md text-black">{{ tecnoEnabled.topic.name }}</span>
-                    <span class="text-md text-black">{% if tecnoEnabled.score_result == None %}Aun no rendido{% else %}{{ tecnoEnabled.score_result }}{% endif %}</span>
-                    <input type="checkbox" class="ml-2 h-4 w-4 text-blue-600 pointer-events-none" {% if tecnoEnabled.status %} checked {% endif %}>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
     </div>
 {% else %}
     <div class="bg-gray-800 p-4 rounded-md shadow-md mx-auto max-w-md">

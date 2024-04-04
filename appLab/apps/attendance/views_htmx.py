@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Students, Teams
+from .models import Students, Teams, TecnoEnabledResults
+from django.db.models import Case, When, Value, BooleanField, Exists, OuterRef
 
 
 # Vista para filtrar grupos por Nombre de estudiante
@@ -21,12 +22,24 @@ def TeamsFilterView(request):
 
 # Vista para filtrar grupos por Nombre de estudiante
 def StudentFilterView(request):
-    name = request.GET.get('name')
-    student = Students.objects.filter(name__icontains=name).first()
-    
+    input_email = request.GET.get('email', '').strip()
+
+    students = Students.objects.filter(email__icontains=input_email).annotate(
+        has_results=Exists(TecnoEnabledResults.objects.filter(student=OuterRef('pk'))),
+        status_all=Case(
+            When(has_results=True, then=Case(
+                When(~Exists(TecnoEnabledResults.objects.filter(student=OuterRef('pk'), status=False)), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )),
+            default=Value(None),
+            output_field=BooleanField(null=True)
+        )
+    )
+
     template_name = 'attendance/admin/filterStudents.html'
-    context={
-        'student': student
-        }
+    context = {
+        'students': students
+    }
 
     return render(request, template_name, context)

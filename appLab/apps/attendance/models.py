@@ -87,7 +87,7 @@ class TopicEnabled(models.Model):
 
 
 class TecnoEnabledResults(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.SET_NULL, verbose_name='Estudiante', related_name='student_enabled', null=True, blank=True)
+    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name='Estudiante', related_name='student_enabled', null=True, blank=True)
     topic = models.ForeignKey(TopicEnabled, on_delete=models.SET_NULL, verbose_name='Nombre habilitador', related_name='topic_enabled', null=True, blank=True)
     score_result = models.SmallIntegerField('Puntaje obtenido', null=True, blank=True)
     status = models.BooleanField('Estado')

@@ -12,7 +12,7 @@ Buscar Estudiante - LAB4.0
 <!-- Carga content page -->
 {% block content %}
 
-<main class="container mx-auto px-4 pt-32">
+<main class="container mx-auto px-4 pt-28">
     <!-- Section searching -->
     <section class="flex justify-center mb-16">
 
@@ -23,8 +23,8 @@ Buscar Estudiante - LAB4.0
                 <input 
                     class="text-input" 
                     type="text" 
-                    name="name" 
-                    placeholder="Ingresa tu nombre"
+                    name="email" 
+                    placeholder="Ingresa tu usuario"
                     hx-target="#response" 
                     hx-trigger="keyup changed delay:500ms" 
                     hx-get="{% url 'attendance_app:students-filter' %}">
