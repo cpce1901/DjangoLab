@@ -226,7 +226,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         tecno_enabled = obj.student_enabled.all()
 
         if not tecno_enabled:
-            return '⭕'  
+            return '❔'  
     
         for student in tecno_enabled:
             if not student.status:
