@@ -7,20 +7,33 @@
                 <h5 class="text-sm text-center text-gray-600">{{ student.email }}</h5>
 
                 <div class="mb-4">
-                    <h4 class="text-lg font-semibold mb-2 text-blue-500">Clases</h4>
+                    <h4 class="text-lg font-semibold mb-2 text-blue-500">Asignaturas</h4>
                     <ul class="list-disc list-inside">
+                        
+                        {% if student.class_name.all %}
+                            
                         {% for class in student.class_name.all %}
                             <li class="text-md font-medium mb-2 text-black">{{ class }}</li>
                         {% endfor %}
+
+                        {% else %}
+                            <li class="text-md font-medium mb-2 text-black">Sin Asignaturas</li>
+                        {% endif %}
                     </ul>
                 </div>
 
                 <div class="mb-4">
                     <h4 class="text-lg font-semibold mb-2 text-blue-500">Equipos</h4>
                     <ul class="list-disc list-inside">
+                        {% if student.team_student.all %}
+
                         {% for team in student.team_student.all %}
                             <li class="mb-1 text-black">{{ team.name }}</li>
                         {% endfor %}
+
+                        {% else %}
+                        <li class="mb-1 text-black">Sin Grupo</li>
+                        {% endif %}
                     </ul>
                 </div>
 
