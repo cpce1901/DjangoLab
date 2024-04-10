@@ -8,11 +8,111 @@ from .models import Attendance, Students, Classes, Teams, Schools, TecnoEnabledR
 
 
 # Resources
+class TecnoEnabledResultResource(ModelResource):
+
+    id = Field(column_name='ID')
+    student = Field(column_name='Estudiante')
+    year = Field(column_name='Año')
+    stage = Field(column_name='Semestre')
+    school = Field(column_name='Escuela')
+    class_name = Field(column_name='Asignatura')
+    topic = Field(column_name='Habilitador')
+    score_result = Field(column_name='Puntaje')
+    status = Field(column_name='Estado')
+
+    class Meta:
+        model = TecnoEnabledResults
+        use_bulk = True
+        batch_size = 500
+
+    def dehydrate_id(self, obj):
+        student_id = obj.id
+        return f'{student_id}'
+
+    def dehydrate_student(self, obj):
+        student_name = getattr(obj.student, "name", "")
+        student_last_name = getattr(obj.student, "last_name", "")
+        return f'{student_name} {student_last_name}'
+    
+    def dehydrate_year(self, obj):
+        student_year = obj.student.class_name.year if obj.student.class_name else '-'
+        return f'{student_year}'
+    
+    def dehydrate_stage(self, obj):
+        student_stage = obj.student.class_name.get_stage_display() if obj.student.class_name else '-'
+        return f'{student_stage}'
+    
+    def dehydrate_school(self, obj):
+        student_school_name = obj.student.class_name.school.code if obj.student.class_name else '-'
+        return f'{student_school_name}'
+    
+    def dehydrate_class_name(self, obj):
+        student_class_name = getattr(obj.student.class_name, "name", "-")
+        return f'{student_class_name}'
+    
+    def dehydrate_topic(self, obj):
+        student_topic = obj.topic.name
+        return f'{student_topic}'
+    
+    def dehydrate_score_result(self, obj):
+        student_score = obj.score_result if obj.score_result else 'No realizado'
+        return f'{student_score}'
+    
+    def dehydrate_status(self, obj):
+        student_status = 'Habilitado' if obj.status else 'No habilitado'
+        return f'{student_status}'
+
+
 class AttendanceResource(ModelResource):
+
+    id = Field(column_name='ID')
+    student = Field(column_name='Estudiante')
+    year = Field(column_name='Año')
+    stage = Field(column_name='Semestre')
+    school = Field(column_name='Escuela')
+    class_name = Field(column_name='Asignatura')
+    date_in = Field(column_name='Hora de ingreso')
+    time_inside = Field(column_name='Tiempo comprometido')
+
     class Meta:
         model = Attendance
         use_bulk = True
         batch_size = 500
+
+    def dehydrate_id(self, obj):
+        student_id = obj.id
+        return f'{student_id}'
+
+    def dehydrate_student(self, obj):
+        student_name = getattr(obj.student, "name", "")
+        student_last_name = getattr(obj.student, "last_name", "")
+        return f'{student_name} {student_last_name}'
+    
+    def dehydrate_year(self, obj):
+        student_year = obj.student.class_name.year if obj.student.class_name else '-'
+        return f'{student_year}'
+    
+    def dehydrate_stage(self, obj):
+        student_stage = obj.student.class_name.get_stage_display() if obj.student.class_name else '-'
+        return f'{student_stage}'
+    
+    def dehydrate_school(self, obj):
+        student_school_name = obj.student.class_name.school.code if obj.student.class_name else '-'
+        return f'{student_school_name}'
+    
+    def dehydrate_class_name(self, obj):
+        student_class_name = getattr(obj.student.class_name, "name", "-")
+        return f'{student_class_name}'
+    
+    def dehydrate_date_in(self, obj):
+        student_date_in = obj.date_in or '-'
+        if not student_date_in == '':
+            return student_date_in.strftime("%Y-%m-%d %H:%M:%S")
+        return f'{student_date_in}'
+    
+    def dehydrate_time_inside(self, obj):
+        student_time_inside = obj.time_inside or '-'
+        return f'{student_time_inside}'
 
 
 class ClassesResource(ModelResource):
@@ -163,7 +263,6 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
     list_filter = ('class_name__school__code', 'class_name__code')
     search_fields = ('name', 'last_name')
-    filter_vertical = ('class_name',)
 
     @admin.display(description='Nombre completo')
     def display_full_name(self, obj):
@@ -171,42 +270,15 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 
     @admin.display(description='Asignatura')
     def display_class_name(self, obj):
-        classes = obj.class_name.all()
-
-        if classes:
-            output = '<ul>'
-            for class_name in classes:
-                output += f'<li>{class_name.school.code} | {class_name.name}</li>'
-            output += '</ul>'
-            return format_html(output)
-        else:
-            return ''
+        return f"{obj.class_name.name if obj.class_name else '-'}"
         
     @admin.display(description='Año')
     def display_class_year(self, obj):
-        classes = obj.class_name.all()
-
-        if classes:
-            output = '<ul>'
-            for class_name in classes:
-                output += f'<li>{class_name.year}</li>'
-            output += '</ul>'
-            return format_html(output)
-        else:
-            return ''
+        return f"{obj.class_name.year if obj.class_name else '-'}"
     
     @admin.display(description='Semestre')
     def display_class_stage(self, obj):
-        classes = obj.class_name.all()
-
-        if classes:
-            output = '<ul>'
-            for class_name in classes:
-                output += f'<li>{class_name.get_stage_display()}</li>'
-            output += '</ul>'
-            return format_html(output)
-        else:
-            return ''
+        return f"{obj.class_name.get_stage_display() if obj.class_name else '-'}"
 
     @admin.display(description='Grupo')
     def display_team(self, obj):
@@ -240,7 +312,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
-    search_fields = ('student_student_name', 'student_student_last_name')
+    search_fields = ('student__name', 'student__last_name')
     list_display = ('display_student_name', 'date_in', 'time_inside')
     list_filter = ('student__class_name__year', 'student__class_name__stage', 'student__class_name__school__code')
 
@@ -250,7 +322,8 @@ class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     
    
 @admin.register(TecnoEnabledResults)
-class TecnoEnabledAdmin(admin.ModelAdmin):
+class TecnoEnabledAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = TecnoEnabledResultResource
     list_display = ('display_student_name', 'display_topic', 'display_score_result', 'status')
     readonly_fields = ('status', )
 

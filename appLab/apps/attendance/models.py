@@ -63,7 +63,7 @@ class Students(models.Model):
     name = models.CharField('Nombre', max_length=32)
     last_name = models.CharField('Apellido', max_length=32)
     email = models.EmailField('Email', null=True)
-    class_name = models.ManyToManyField(Classes, verbose_name='Asignatura', related_name='class_student', blank=True)
+    class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_student', null=True, blank=True)
     
     class Meta():
         verbose_name = "Estudiante"
