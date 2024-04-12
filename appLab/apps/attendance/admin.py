@@ -130,7 +130,7 @@ class SchoolsResource(ModelResource):
 
 
 class StudentsResource(ModelResource):
-    class_name = Field(column_name='class_name', attribute='class_name',widget=ManyToManyWidget(Classes, field='id', separator=','))
+    class_name = Field(column_name='class_name', attribute='class_name',widget=ForeignKeyWidget(Classes, field='id'))
 
     class Meta:
         model = Students
@@ -307,8 +307,6 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         return '✅'  
        
 
-    
-
 @admin.register(Attendance)
 class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = AttendanceResource
@@ -341,10 +339,10 @@ class TecnoEnabledAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
         return f'{obj.score_result if obj.score_result else 0}/{obj.topic.score}'
 
 
-
 @admin.register(TopicEnabled)
 class TecnoEnabledAdmin(admin.ModelAdmin):
-    list_display = ('name', 'score')
+    list_display = ('id', 'name', 'score')
+    ordering = ('id', )
 
   
 

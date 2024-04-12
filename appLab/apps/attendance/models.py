@@ -82,6 +82,11 @@ class TopicEnabled(models.Model):
         verbose_name = "Tipo Habilitador"
         verbose_name_plural = "Tipos Habilitador"
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.upper()
+
+        super(TopicEnabled, self).save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.name}"
 
@@ -96,6 +101,7 @@ class TecnoEnabledResults(models.Model):
         verbose_name = "Resultado Habilitadores"
         verbose_name_plural = "Resultados Habilitadores"
         unique_together = ['student', 'topic']
+
 
     def save(self, *args, **kwargs):
         if self.score_result is not None:

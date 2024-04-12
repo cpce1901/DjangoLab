@@ -1,4 +1,5 @@
 from django import forms
+from .models import TopicEnabled
 
 class StudentFoundForm(forms.Form):
     email = forms.CharField(
@@ -33,5 +34,13 @@ class AttendanceForm(forms.Form):
         }),
     )
 
+
+class ExelForm(forms.Form):
+        
+    file = forms.FileField(
+        label="Selecciona un archivo",
+    )
+
+    
 
    

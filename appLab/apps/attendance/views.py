@@ -1,10 +1,12 @@
+
+import pandas as pd
 from django.shortcuts import render
 from django.views.generic import FormView,TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import Students, Attendance, Teams
-from .form import AttendanceForm, StudentFoundForm
+from .models import Students, Attendance, Teams, TopicEnabled, TecnoEnabledResults
+from .form import AttendanceForm, StudentFoundForm, ExelForm
 from datetime import datetime, timedelta
 
 
@@ -114,8 +116,60 @@ class StudentsView(TemplateView):
 
     
 
+class ExelUploadForm(FormView):
+    template_name = 'attendance/admin/uploadExel.html'
+    form_class = ExelForm
+    success_url = reverse_lazy("attendance_app:student")
+    
+
+    def form_valid(self, form):
+        uploaded_file = self.request.FILES['file']
         
-    
-    
-    
-    
+        extention = uploaded_file.name.split('.')[-1].lower()
+        if extention != 'xlsx':
+            messages.error(
+                self.request,
+                "El formato de archivo es invalido, debes subir un archivo .xlsx"
+            )
+            return self.form_invalid(form)
+
+        df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Tareas', 'Puntos', 'Puntos máximos'])
+        df['Puntos'] = df['Puntos'].fillna(0).astype(int)
+
+        # tester-dev: ICMI:OK
+        for i in range (int(len(df))):
+            student = Students.objects.filter(last_name__icontains=df["Apellidos"][i]).first()
+            if student is not None:
+                if 'internet de las cosas'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=1
+                elif '3D'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=2
+                elif 'cobot'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=3
+                elif 'gladius'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=4
+                elif 'dron dji'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=5
+                elif 'realidad virtual'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=6
+                elif 'jetauto'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=7
+                elif 'ia'.lower() in str(df['Tareas'][i]).lower():
+                    topic_id=8
+                else:
+                    break
+
+                TecnoEnabledResults.objects.update_or_create(
+                    student=student,
+                    topic_id=topic_id,
+                    defaults={
+                        'score_result': df['Puntos'][i],
+                        'status': df['Puntos'][i] is not None and df['Puntos'][i] >= 60
+                    }
+                )
+
+        messages.success(
+            self.request,
+            "Archivo subido con exito"
+        )
+        return redirect(reverse_lazy("attendance_app:update-data"))

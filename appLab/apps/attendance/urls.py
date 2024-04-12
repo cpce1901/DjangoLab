@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AttendanceFormView, StudentFoundFormView, TeamsView, StudentsView
+from .views import AttendanceFormView, StudentFoundFormView, TeamsView, StudentsView, ExelUploadForm
 from .views_htmx import TeamsFilterView, StudentFilterView
 
 app_name = 'attendance_app'
@@ -9,6 +9,7 @@ urlpatterns = [
     path('asistencia/<str:student>/', AttendanceFormView.as_view(), name="attendance"),
     path('grupos/', TeamsView.as_view(), name='teams'),
     path('estudiantes/', StudentsView.as_view(), name='students'),
+    path('exel/update/', ExelUploadForm.as_view(), name='update-data'),
 ]
 
 htmx_urlpatterns = [

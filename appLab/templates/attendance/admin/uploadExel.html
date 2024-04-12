@@ -1,0 +1,84 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+<!-- Carga title page -->
+{% block title %}
+Update de alumnos - LAB4.0
+{% endblock title %}
+
+{% block content %}
+
+<main class="container mx-auto h-screen flex flex-col justify-center items-center gap-12">
+
+    <h1 class="font-exo text-6xl text-center">Actualización de datos</h1>
+
+    <form method="post" class="w-2/3 flex flex-col gap-3" enctype="multipart/form-data">{% csrf_token %}
+
+        <div class="flex flex-col gap-1 mb-6 xl:mb-4">
+            <label class="font-exo text-base font-semibold text-gray-500">{{ form.topic.label }}</label>
+            {{ form.topic }}
+        </div>
+
+        <div class="flex flex-col gap-1 mb-6 xl:mb-4">
+            <label class="font-exo text-base font-semibold text-gray-500">{{ form.file.label }}</label>
+            {{ form.file }}
+        </div>
+
+        <input type="submit" value="Enviar"
+            class="mt-5 px-10 py-3 text-center text-lg outline outline-1 outline-gray-400 font-rale bg-indigo-500 text-white  transition-all duration-300">
+    </form>
+
+    <div>
+        {% if messages %}
+
+        {% for message in messages %}
+
+        {% if message.tags == "success" %}
+
+        <script>
+            Swal.fire({
+                title: 'Éxito',
+                text: '{{ message }}',
+                icon: 'success',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "error" %}
+
+        <script>
+            Swal.fire({
+                title: 'Error',
+                text: '{{ message }}',
+                icon: 'error',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% elif message.tags == "info" %}
+
+        <script>
+            Swal.fire({
+                title: 'Info',
+                text: '{{ message }}',
+                icon: 'info',
+                confirmButtonText: 'Cerrar'
+            });
+        </script>
+
+        {% endif %}
+
+        {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+
+
+{% endblock content %}
