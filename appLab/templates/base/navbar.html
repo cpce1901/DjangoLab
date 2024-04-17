@@ -37,7 +37,9 @@
                             <a href="{% url 'attendance_app:students' %}" title="Navegar a Equipos"
                                 class="{% if request.path == '/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Estudiantes</a>
                             <a href="{% url 'attendance_app:update-data' %}" title="Navegar a Equipos"
-                                class="{% if request.path == '/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel</a>
+                                class="{% if request.path == '/exel/update/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel</a>
+                            <a href="{% url 'attendance_app:update-data-students' %}" title="Navegar a Equipos"
+                                class="{% if request.path == '/exel/update/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel-estudinates</a>
 
                         </div>
 

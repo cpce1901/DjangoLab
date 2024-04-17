@@ -13,9 +13,24 @@ Update de alumnos - LAB4.0
 
 <main class="container mx-auto h-screen flex flex-col justify-center items-center gap-12">
 
-    <h1 class="font-exo text-6xl text-center">Actualización de datos habilitadores</h1>
+    <h1 class="font-exo text-6xl text-center">Actualización de estudiantes</h1>
 
     <form method="post" class="w-2/3 flex flex-col gap-3" enctype="multipart/form-data">{% csrf_token %}
+
+        <div class="flex flex-col gap-1 mb-6 xl:mb-4">
+            <label class="font-exo text-base font-semibold text-gray-500">{{ form.class_name.label }}</label>
+            {{ form.class_name }}
+            {% if form.class_name.errors %}
+            <ul>
+                {% for error in form.class_name.errors %}
+                <li class="text-sm text-red-500 font-exo font-semibold">{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+
+
 
         <div class="flex flex-col gap-1 mb-6 xl:mb-4">
             <label class="font-exo text-base font-semibold text-gray-500">{{ form.topic.label }}</label>

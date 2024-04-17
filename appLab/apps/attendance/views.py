@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Students, Attendance, Teams, TopicEnabled, TecnoEnabledResults
-from .form import AttendanceForm, StudentFoundForm, ExelForm
+from .form import AttendanceForm, StudentFoundForm, ExelForm, ExelFormStudents, Classes
 from datetime import datetime, timedelta
 
 
@@ -121,7 +121,25 @@ class ExelUploadForm(FormView):
     form_class = ExelForm
     success_url = reverse_lazy("attendance_app:student")
     
+    def change_name_by_id(self, task):
 
+        if 'artificial' in task:
+            return TopicEnabled.objects.filter(name='IA').first().id
+        elif 'jetauto' in task:
+            return TopicEnabled.objects.filter(name='ROV').first().id
+        elif 'aumentada' in task:
+            return TopicEnabled.objects.filter(name='VR').first().id
+        elif 'dron' in task:
+            return TopicEnabled.objects.filter(name='DRON').first().id
+        elif 'gladius' in task:
+            return TopicEnabled.objects.filter(name='GLADIUS').first().id
+        elif 'cobot' in task:
+            return TopicEnabled.objects.filter(name='COBOT').first().id
+        elif 'fabricación' in task:
+            return TopicEnabled.objects.filter(name='F3D').first().id
+        elif 'internet de las cosas' in task:
+            return TopicEnabled.objects.filter(name='IOT').first().id
+        
     def form_valid(self, form):
         uploaded_file = self.request.FILES['file']
         
@@ -133,31 +151,15 @@ class ExelUploadForm(FormView):
             )
             return self.form_invalid(form)
 
-        df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Tareas', 'Puntos', 'Puntos máximos'])
+        df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico', 'Tareas', 'Puntos', 'Puntos máximos'])
         df['Puntos'] = df['Puntos'].fillna(0).astype(int)
 
-        # tester-dev: ICMI:OK
-        for i in range (int(len(df))):
-            student = Students.objects.filter(last_name__icontains=df["Apellidos"][i]).first()
-            if student is not None:
-                if 'internet de las cosas'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=1
-                elif '3D'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=2
-                elif 'cobot'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=3
-                elif 'gladius'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=4
-                elif 'dron dji'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=5
-                elif 'realidad virtual'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=6
-                elif 'jetauto'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=7
-                elif 'ia'.lower() in str(df['Tareas'][i]).lower():
-                    topic_id=8
-                else:
-                    break
+        for i in range(int(len(df))):   
+            try:       
+                student = Students.objects.get(email=df["Dirección de correo electrónico"][i])
+                task = str(df['Tareas'][i]).lower().strip()
+
+                topic_id = self.change_name_by_id(task)
 
                 TecnoEnabledResults.objects.update_or_create(
                     student=student,
@@ -167,9 +169,111 @@ class ExelUploadForm(FormView):
                         'status': df['Puntos'][i] is not None and df['Puntos'][i] >= 60
                     }
                 )
+                
+                messages.success(
+                    self.request,
+                    "Archivo subido con exito"
+                )
 
+                return redirect(reverse_lazy("attendance_app:update-data"))
+            
+            except:
+                messages.error(
+                self.request,
+                "El formato de archivo es invalido, debes subir un archivo .xlsx"
+                )
+                
+            return self.form_invalid(form)
+                   
+        
+    
+
+
+class ExelUploadStudents(FormView):
+    template_name = 'attendance/admin/uploadExelStudents.html'
+    form_class = ExelFormStudents
+    success_url = reverse_lazy("attendance_app:student")
+    
+          
+    def form_valid(self, form):
+        uploaded_file = self.request.FILES['file']
+        class_name = form.cleaned_data["class_name"]
+        users_to_update = []
+        users_to_create = []
+
+        print(class_name)
+
+        # Leer extension de archivo exel
+        extention = uploaded_file.name.split('.')[-1].lower()
+        if extention != 'xlsx':
+            messages.error(
+                self.request,
+                "El formato de archivo es invalido, debes subir un archivo .xlsx"
+            )
+            return self.form_invalid(form)
+
+        # Leer archivo exel para conseguir header y nombre de ASIGNATURA
+        df_one = pd.read_excel(uploaded_file)
+        
+        if not df_one.columns.str.contains(str(class_name.school.code)).any():
+            messages.error(
+                self.request,
+                "El archivo subido no corresponde a la asignatura"
+            )
+            return self.form_invalid(form)
+
+        # Leer archivo exel con los header de la segunda linea
+        df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico'])
+        
+        for index, row in df.iterrows():
+            student = Students.objects.filter(email=row['Dirección de correo electrónico']).first()
+            if student is None:
+                # Agregar al listado de estudiantes a crear
+                users_to_create.append(Students(name=row['Nombre'], last_name=row['Apellidos'], email=row['Dirección de correo electrónico'], class_name=class_name))
+            else:
+                # Agregar al listado de estudiantes a actualizar
+                student.name = row['Nombre']
+                student.last_name = row['Apellidos']
+                student.email = row['Dirección de correo electrónico']
+                student.class_name = class_name
+                users_to_update.append(student)
+
+        if users_to_create:
+            try:
+                Students.objects.bulk_create(users_to_create)
+            except Exception as e:
+                if 'Duplicate entry' in str(e):
+                    messages.error(
+                    self.request,
+                    "El archivo contiene usuarios duplicados. Por favor, revisa el archivo y elimina las entradas duplicadas."
+                )
+                else:
+                    messages.error(
+                    self.request,
+                    "Puede que tu archivo no sea correcto. Por favor, revísalo e inténtalo nuevamente."
+                )
+                
+                return self.form_invalid(form)
+
+        if users_to_update:
+            try:
+                Students.objects.bulk_update(users_to_update, ['name', 'last_name', 'email', 'class_name'])
+            except Exception as e:
+                if 'Duplicate entry' in str(e):
+                    messages.error(
+                    self.request,
+                    "El archivo contiene usuarios duplicados. Por favor, revisa el archivo y elimina las entradas duplicadas."
+                )
+                else:
+                    messages.error(
+                    self.request,
+                    "Puede que tu archivo no sea correcto. Por favor, revísalo e inténtalo nuevamente."
+                )
+                
+                return self.form_invalid(form)
+              
         messages.success(
-            self.request,
-            "Archivo subido con exito"
+        self.request,
+        "Archivo subido con exito"
         )
-        return redirect(reverse_lazy("attendance_app:update-data"))
+        return redirect(reverse_lazy("attendance_app:update-data-students"))

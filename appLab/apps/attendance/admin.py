@@ -4,6 +4,7 @@ from import_export.resources import ModelResource, Field
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from .models import Attendance, Students, Classes, Teams, Schools, TecnoEnabledResults, TopicEnabled
+from datetime import datetime
 
 
 
@@ -67,6 +68,7 @@ class AttendanceResource(ModelResource):
 
     id = Field(column_name='ID')
     student = Field(column_name='Estudiante')
+    email = Field(column_name='Email')
     year = Field(column_name='Año')
     stage = Field(column_name='Semestre')
     school = Field(column_name='Escuela')
@@ -76,8 +78,23 @@ class AttendanceResource(ModelResource):
 
     class Meta:
         model = Attendance
-        use_bulk = True
+        fields = ('id', 'student', 'email', 'year', 'stage', 'school', 'class_name', 'date_in', 'time_inside')
         batch_size = 500
+
+    
+    def get_instance(self, instance_loader, row):
+        try:
+            return self.get_queryset().get(id=row['ID'])
+        except Attendance.DoesNotExist:
+            return None
+
+    def import_obj(self, obj, data, dry_run, row_number=None, file_name=None, user=None):
+        obj.id = data.get('ID')
+        obj.student = Students.objects.get(email=data.get('Email'))
+        obj.date_in = data.get('Hora de ingreso')
+        obj.time_inside = data.get('Tiempo comprometido')
+        return obj
+
 
     def dehydrate_id(self, obj):
         student_id = obj.id
@@ -88,26 +105,42 @@ class AttendanceResource(ModelResource):
         student_last_name = getattr(obj.student, "last_name", "")
         return f'{student_name} {student_last_name}'
     
-    def dehydrate_year(self, obj):
-        student_year = obj.student.class_name.year if obj.student.class_name else '-'
+    def dehydrate_email(self, obj):
+        student_year = obj.student.email if obj.student else '-'
         return f'{student_year}'
     
+    def dehydrate_year(self, obj):
+        if obj.student and obj.student.class_name:
+            student_year = obj.student.class_name.year
+        else:
+            student_year = '-'
+        return str(student_year)
+    
     def dehydrate_stage(self, obj):
-        student_stage = obj.student.class_name.get_stage_display() if obj.student.class_name else '-'
-        return f'{student_stage}'
-    
+        if obj.student and obj.student.class_name:
+            student_stage = obj.student.class_name.get_stage_display()
+        else:
+            student_stage = '-'
+        return str(student_stage)
+
     def dehydrate_school(self, obj):
-        student_school_name = obj.student.class_name.school.code if obj.student.class_name else '-'
-        return f'{student_school_name}'
-    
+        if obj.student and obj.student.class_name and obj.student.class_name.school:
+            student_school_name = obj.student.class_name.school.code
+        else:
+            student_school_name = '-'
+        return str(student_school_name)
+
     def dehydrate_class_name(self, obj):
-        student_class_name = getattr(obj.student.class_name, "name", "-")
-        return f'{student_class_name}'
+        if obj.student and obj.student.class_name:
+            student_class_name = getattr(obj.student.class_name, "name", "-")
+        else:
+            student_class_name = "-"
+        return str(student_class_name)
     
     def dehydrate_date_in(self, obj):
         student_date_in = obj.date_in or '-'
         if not student_date_in == '':
-            return student_date_in.strftime("%Y-%m-%d %H:%M:%S")
+            return student_date_in
         return f'{student_date_in}'
     
     def dehydrate_time_inside(self, obj):
@@ -226,7 +259,7 @@ class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Teams)
 class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TeamsResource    
-    list_display = ('name', 'display_class_name', 'display_class_name_year', 'display_class_name_stage', 'display_students')
+    list_display = ('name', 'display_class_name', 'display_class_name_year', 'display_class_name_stage', 'display_students', 'challenge')
     list_filter = ('class_name__school__code', 'class_name__year', 'class_name__stage')
     filter_vertical = ('team_name',)
 
@@ -262,7 +295,7 @@ class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     inlines = (TecnoEnabledResultInline,)
     list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
     list_filter = ('class_name__school__code', 'class_name__code')
-    search_fields = ('name', 'last_name')
+    search_fields = ('name', 'last_name', 'email')
 
     @admin.display(description='Nombre completo')
     def display_full_name(self, obj):

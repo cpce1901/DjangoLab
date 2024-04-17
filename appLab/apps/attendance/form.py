@@ -1,5 +1,6 @@
 from django import forms
-from .models import TopicEnabled
+from .models import Classes
+from django.contrib import messages
 
 class StudentFoundForm(forms.Form):
     email = forms.CharField(
@@ -41,6 +42,37 @@ class ExelForm(forms.Form):
         label="Selecciona un archivo",
     )
 
+
+class ExelFormStudents(forms.Form):
+
+    file = forms.FileField(
+        label="Selecciona un archivo",
+    )
+
+    class_name = forms.ModelChoiceField(
+        label='Asignatura',
+        queryset=Classes.objects.all(),
+        required=True,
+        widget=forms.Select(
+            attrs={
+                "id": "class_name",
+                "class": "py-2 outline outline-1 outline-gray-300 xl:text-xl",
+            }
+        )
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        class_name = cleaned_data.get("class_name")
+
+        if class_name is not None and class_name not in self.fields['class_name'].queryset:
+            raise forms.ValidationError("La asignatura seleccionada no es válida.")
+        
+        return cleaned_data
+
+    
+        
+    
     
 
    
