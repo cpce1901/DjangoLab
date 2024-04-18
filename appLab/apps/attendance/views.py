@@ -122,70 +122,79 @@ class ExelUploadForm(FormView):
     success_url = reverse_lazy("attendance_app:student")
     
     def change_name_by_id(self, task):
-
-        if 'artificial' in task:
-            return TopicEnabled.objects.filter(name='IA').first().id
-        elif 'jetauto' in task:
-            return TopicEnabled.objects.filter(name='ROV').first().id
-        elif 'aumentada' in task:
-            return TopicEnabled.objects.filter(name='VR').first().id
-        elif 'dron' in task:
-            return TopicEnabled.objects.filter(name='DRON').first().id
-        elif 'gladius' in task:
-            return TopicEnabled.objects.filter(name='GLADIUS').first().id
-        elif 'cobot' in task:
-            return TopicEnabled.objects.filter(name='COBOT').first().id
-        elif 'fabricación' in task:
-            return TopicEnabled.objects.filter(name='F3D').first().id
-        elif 'internet de las cosas' in task:
-            return TopicEnabled.objects.filter(name='IOT').first().id
         
+        task = str(task).lower()
+        if 'artificial' in task:
+            topic = TopicEnabled.objects.get(name='IA')
+        elif 'jetauto' in task:
+            topic = TopicEnabled.objects.get(name='ROV')
+        elif 'aumentada' in task:
+            topic = TopicEnabled.objects.get(name='VR')
+        elif 'dron' in task:
+            topic = TopicEnabled.objects.get(name='DRON')
+        elif 'gladius' in task:
+            topic = TopicEnabled.objects.get(name='GLADIUS')
+        elif 'cobot' in task:
+            topic = TopicEnabled.objects.get(name='COBOT')
+        elif 'fabricación' in task:
+            topic = TopicEnabled.objects.get(name='F3D')
+        elif 'internet de las cosas' in task:
+            topic = TopicEnabled.objects.get(name='IOT')
+        else:
+            return None
+        
+        return topic
+
     def form_valid(self, form):
         uploaded_file = self.request.FILES['file']
-        
-        extention = uploaded_file.name.split('.')[-1].lower()
-        if extention != 'xlsx':
+        try:
+            df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico', 'Tareas', 'Puntos', 'Puntos máximos'])
+            df['Puntos'] = df['Puntos'].fillna(0).astype(int)
+
+            topic_result_to_create = []
+            topic_result_to_update = []
+
+            for index, row in df.iterrows():
+                topico = self.change_name_by_id(row['Tareas'])
+                student = Students.objects.filter(email=row['Dirección de correo electrónico']).first()
+                if student is None:
+                    messages.error(
+                        self.request,
+                        "El archivo contiene datos inválidos: el estudiante no existe"
+                    )
+                    return self.form_invalid(form)
+                
+                if topico is None:
+                    messages.error(
+                        self.request,
+                        f"No se encontró el tema para la tarea: {row['Tareas']}"
+                    )
+                    return self.form_invalid(form)
+
+                topic_result, created = TecnoEnabledResults.objects.update_or_create(
+                student=student,
+                topic=topico,
+                defaults={
+                    'score_result': row['Puntos'],
+                    'status': row['Puntos'] is not None and row['Puntos'] >= 60
+                }
+            )
+    
+            messages.success(
+                self.request,
+                "Archivo subido con éxito"
+            )
+
+            return redirect(reverse_lazy("attendance_app:update-data"))
+
+        except Exception as e:
             messages.error(
                 self.request,
-                "El formato de archivo es invalido, debes subir un archivo .xlsx"
+                f"Error al procesar el archivo: {str(e)}"
             )
             return self.form_invalid(form)
 
-        df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico', 'Tareas', 'Puntos', 'Puntos máximos'])
-        df['Puntos'] = df['Puntos'].fillna(0).astype(int)
-
-        for i in range(int(len(df))):   
-            try:       
-                student = Students.objects.get(email=df["Dirección de correo electrónico"][i])
-                task = str(df['Tareas'][i]).lower().strip()
-
-                topic_id = self.change_name_by_id(task)
-
-                TecnoEnabledResults.objects.update_or_create(
-                    student=student,
-                    topic_id=topic_id,
-                    defaults={
-                        'score_result': df['Puntos'][i],
-                        'status': df['Puntos'][i] is not None and df['Puntos'][i] >= 60
-                    }
-                )
-                
-                messages.success(
-                    self.request,
-                    "Archivo subido con exito"
-                )
-
-                return redirect(reverse_lazy("attendance_app:update-data"))
-            
-            except:
-                messages.error(
-                self.request,
-                "El formato de archivo es invalido, debes subir un archivo .xlsx"
-                )
-                
-            return self.form_invalid(form)
-                   
-        
+        return super().form_valid(form)
     
 
 
@@ -200,8 +209,6 @@ class ExelUploadStudents(FormView):
         class_name = form.cleaned_data["class_name"]
         users_to_update = []
         users_to_create = []
-
-        print(class_name)
 
         # Leer extension de archivo exel
         extention = uploaded_file.name.split('.')[-1].lower()
