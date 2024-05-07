@@ -357,6 +357,7 @@ class TecnoEnabledAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TecnoEnabledResultResource
     list_display = ('display_student_name', 'display_topic', 'display_score_result', 'status')
     readonly_fields = ('status', )
+    list_filter = ('student__class_name__school__code', 'student__class_name__code')
 
 
     @admin.display(description='Estudiante')

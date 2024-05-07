@@ -23,7 +23,6 @@ INSTALLED_APPS = [
 
     # APPS_LOCALES
     'apps.attendance',
-    'apps.inventory',
     'apps.store'
 ]
 

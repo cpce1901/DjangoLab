@@ -36,27 +36,69 @@
                                 class="{% if request.path == '/grupos/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Equipos</a>
                             <a href="{% url 'attendance_app:students' %}" title="Navegar a Equipos"
                                 class="{% if request.path == '/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Estudiantes</a>
-                            <a href="{% url 'attendance_app:update-data' %}" title="Navegar a Equipos"
-                                class="{% if request.path == '/exel/update/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel</a>
-                            <a href="{% url 'attendance_app:update-data-students' %}" title="Navegar a Equipos"
-                                class="{% if request.path == '/exel/update/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel-estudinates</a>
 
-                        </div>
+                            <div class="relative">
+                                <a href="#" id="dropdown-toggle"
+                                    class="flex items-center justify-between w-full py-2 px-3 font-medium text-gray-900 border-b border-gray-100 md:w-auto hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-600 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:dark:hover:bg-transparent dark:border-gray-700 cursor-pointer">
+                                    Admin
+                                </a>
+
+                                <div
+                                    class="dropdown-menu absolute top-full left-0 z-10 hidden w-auto grid-cols-2 text-sm bg-white border border-gray-100 rounded-lg shadow-md dark:border-gray-700 md:grid-cols-3 dark:bg-gray-700">
+                                    <div class="p-4 pb-0 text-gray-900 md:pb-4 dark:text-white">
+                                        <ul class="space-y-4">
+                                            <li>
+                                                <a href="{% url 'attendance_app:update-data' %}"
+                                                    title="Navegar a Equipos"
+                                                    class="{% if request.path == '/exel/update/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel</a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'attendance_app:update-data-students' %}"
+                                                    title="Navegar a Equipos"
+                                                    class="{% if request.path == '/exel/update/estudiantes/' %}md:font-bold font-medium{% else %}md:font-light hover:font-medium font-light{% endif %} tracking-wide cursor-pointer px-3 py-2 rounded  text-lg text-slate-800  md:text-white  transition-all duration-300">Exel-estudinates</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
 
 
+                            <!-- Boton -->
+                            <div class="flex flex-col gap-5 border-t py-8 px-6 md:border-t-0 md:py-0 md:pr-0 md:pl-6">
 
-                        <!-- Boton -->
-                        <div class="flex flex-col gap-5 border-t py-8 px-6 md:border-t-0 md:py-0 md:pr-0 md:pl-6">
-
-                            <a href="{%  url 'admin:index' %}"
-                                class="block px-6 py-2 rounded text-center text-white text-lg font-semibold transition bg-blue-500 hover:bg-blue-600">Ir
-                                a APP</a>
-                            <a href="tel:+56974699573" title="llamada de teléfono"
-                                class="block md:hidden px-6 py-2 rounded text-center text-white text-lg font-semibold transition bg-blue-500 hover:bg-blue-600">¡Llámanos!</a>
+                                <a href="{%  url 'admin:index' %}"
+                                    class="block px-6 py-2 rounded text-center text-white text-lg font-semibold transition bg-blue-500 hover:bg-blue-600">Ir
+                                    a APP</a>
+                                <a href="tel:+56974699573" title="llamada de teléfono"
+                                    class="block md:hidden px-6 py-2 rounded text-center text-white text-lg font-semibold transition bg-blue-500 hover:bg-blue-600">¡Llámanos!</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </nav>
+
+    <script>
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Función para cerrar el dropdown
+        function closeDropdown() {
+            dropdownMenu.classList.add('hidden');
+        }
+
+        // Abrir el dropdown al hacer clic en el enlace
+        dropdownToggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            dropdownMenu.classList.toggle('hidden');
+        });
+
+        // Cerrar el dropdown al hacer clic fuera de él
+        document.addEventListener('click', function (event) {
+            const target = event.target;
+            if (!dropdownToggle.contains(target) && !dropdownMenu.contains(target)) {
+                closeDropdown();
+            }
+        });
+    </script>
 </header>
