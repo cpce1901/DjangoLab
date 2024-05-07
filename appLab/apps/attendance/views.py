@@ -1,12 +1,19 @@
 import pandas as pd
 from django.shortcuts import render
+from django.contrib.auth import logout
 from django.views.generic import FormView,TemplateView
-from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Students, Attendance, Teams, TopicEnabled, TecnoEnabledResults
 from .form import AttendanceForm, StudentFoundForm, ExelForm, ExelFormStudents, Classes
 from datetime import datetime, timedelta
+
+# LogOut
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("attendance_app:student"))
 
 
 # Vista Inicial Ingreso a Lab
@@ -113,7 +120,6 @@ class TeamsView(TemplateView):
 class StudentsView(TemplateView):
     template_name = 'attendance/admin/studentDetail.html'
 
-    
 
 class ExelUploadForm(FormView):
     template_name = 'attendance/admin/uploadExel.html'
@@ -195,7 +201,6 @@ class ExelUploadForm(FormView):
 
         return super().form_valid(form)
     
-
 
 class ExelUploadStudents(FormView):
     template_name = 'attendance/admin/uploadExelStudents.html'

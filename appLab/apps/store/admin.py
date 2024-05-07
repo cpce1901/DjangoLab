@@ -5,20 +5,40 @@ from import_export.resources import ModelResource
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 
 
-# INLINES
+# Resources
+class MaterialsResource(ModelResource):
+    class Meta:
+        model = Materials
+        use_bulk = True
+        batch_size = 500
+
+
+class CategoriesResource(ModelResource):
+    class Meta:
+        model = Categories
+        use_bulk = True
+        batch_size = 500
+
+
+# Inlines
 class ItemsInlines(admin.TabularInline):
     autocomplete_fields = ('item', )
     model = Items
     extra = 0
     form = ItemsForm
 
+
+# Admin
 @admin.register(Categories)
-class CategoriesAdmin(admin.ModelAdmin):
+class CategoriesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = CategoriesResource
     list_display = ('id', 'name')
+    ordering = ('id',)
 
 
 @admin.register(Materials)
-class MaterialsAdmin(admin.ModelAdmin):
+class MaterialsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = MaterialsResource
     list_display = ('show_category', 'code', 'item','description', 'stock')
     ordering = ('id', )
     search_fields = ('description', 'code', 'item')
@@ -32,7 +52,6 @@ class MaterialsAdmin(admin.ModelAdmin):
 @admin.register(Items)
 class ItemsAdmin(admin.ModelAdmin):
     list_display = ('id', 'gives', 'item', 'count', 'is_back')
-
 
 
 @admin.register(Gives)
