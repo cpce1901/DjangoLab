@@ -44,7 +44,7 @@ def ResultsFilterView(request):
 
     fig = px.pie(
         values=[aprobe_students_count, reprobe_students_count],
-        names=['Aprobados', 'Reprobados'],
+        names=['Habilitados', 'No habilitados'],
         title='Estado de habilitadores'
     )
 
