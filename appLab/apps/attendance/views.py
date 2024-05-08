@@ -121,6 +121,7 @@ class StudentsView(TemplateView):
     template_name = 'attendance/admin/studentDetail.html'
 
 
+# Actualizacion de habilitadores
 class ExelUploadForm(FormView):
     template_name = 'attendance/admin/uploadExel.html'
     form_class = ExelForm
@@ -202,6 +203,7 @@ class ExelUploadForm(FormView):
         return super().form_valid(form)
     
 
+# Actualizacion de estudiantes
 class ExelUploadStudents(FormView):
     template_name = 'attendance/admin/uploadExelStudents.html'
     form_class = ExelFormStudents
@@ -288,3 +290,5 @@ class ExelUploadStudents(FormView):
         "Archivo subido con exito"
         )
         return redirect(reverse_lazy("attendance_app:update-data-students"))
+
+

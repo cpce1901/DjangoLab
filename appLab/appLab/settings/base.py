@@ -23,7 +23,8 @@ INSTALLED_APPS = [
 
     # APPS_LOCALES
     'apps.attendance',
-    'apps.store'
+    'apps.store',
+    'apps.report'
 ]
 
 MIDDLEWARE = [
