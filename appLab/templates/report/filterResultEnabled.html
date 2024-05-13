@@ -2,12 +2,13 @@
 
 {% if chart %}
 
-<div class="p-10 outline outline-1 outline-sky-600 rounded-2xl shadow-xl mb-32 flex-col gap-10">
-    <div class="flex gap-10">
-        <section id="data-response" class="w-2/6">
+<div class="p-10 outline outline-1 outline-sky-600 rounded-2xl shadow-xl mb-32 flex-col gap-10 print:p-2">
+    <div class="flex gap-10 print:flex-col print:justify-center print:items-center print:gap-0">
+        <section id="data-response" class="w-2/6 print:w-full print:text-center">
             {{ chart | safe }}
         </section>
-        <div class="flex flex-col w-4/6 gap-10">
+
+        <div class="flex flex-col w-4/6 gap-10 print:w-full">
             {% if aprobe_students %}
             <section class="">
                 <h1 class="font-exo text-indigo-600 mb-1"> Alumnos habilitados</h1>
@@ -15,20 +16,20 @@
                     <table class="table-auto w-auto">
                         <thead>
                             <tr class="bg-gray-200 text-xs">
-                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2 print:hidden">ID</th>
                                 <th class="px-4 py-2">Estudiante</th>
                                 {% for topic in topics %}
-                                <th class="border px-4 py-2">{{ topic.name }}</th>
+                                <th class="border px-4 py-2 print:px-1 print:py-1 print:text-[12px]">{{ topic.name }}</th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for student in aprobe_students %}
                             <tr class="text-center text-xs">
-                                <td class="border px-4 py-2">{{ forloop.counter }}</td>
-                                <td class="border px-4 py-2">{{ student }}</td>
+                                <td class="border px-4 py-2 print:hidden">{{ forloop.counter }}</td>
+                                <td class="border px-4 py-2 print:text-[10px]">{{ student }}</td>
                                 {% for result in student.student_enabled.all %}
-                                <td class="border px-4 py-2 {% if result.score_result >= 60 %} text-green-700 {% endif %}">{{ result.score_result }}</td>
+                                <td class="border px-4 py-2 print:px-1 print:py-1 print:text-[10px] {% if result.score_result >= 60 %} text-green-700 {% endif %}">{{ result.score_result }}</td>
                                 {% endfor %}
                             </tr>
                             {% endfor %}
@@ -46,20 +47,20 @@
                     <table class="table-auto w-full">
                         <thead>
                             <tr class="bg-gray-200 text-xs">
-                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2 print:hidden">ID</th>
                                 <th class="px-4 py-2">Estudiante</th>
                                 {% for topic in topics %}
-                                <th class="border px-4 py-2">{{ topic.name }}</th>
+                                <th class="border px-4 py-2 print:px-1 print:py-1 print:text-[12px]">{{ topic.name }}</th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for student in reprobe_students %}
                             <tr class="text-center text-xs">
-                                <td class="border px-4 py-2">{{ forloop.counter }}</td>
-                                <td class="border px-4 py-2">{{ student }}</td>
+                                <td class="border px-4 py-2 print:hidden">{{ forloop.counter }}</td>
+                                <td class="border px-4 py-2 print:text-[10px]">{{ student }}</td>
                                 {% for result in student.student_enabled.all %}
-                                <td class="border px-4 py-2 {% if result.score_result >= 60 %} text-green-700 {% else %}  text-red-700 {% endif %}">{{ result.score_result }}</td>
+                                <td class="border px-4 py-2 print:px-1 print:py-1 print:text-[10px] {% if result.score_result >= 60 %} text-green-700 {% else %}  text-red-700 {% endif %}">{{ result.score_result }}</td>
                                 {% endfor %}
                             </tr>
                             {% endfor %}

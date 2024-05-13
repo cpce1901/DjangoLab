@@ -13,18 +13,18 @@ Resultados Habilitadores - LAB4.0
 {% block content %}
 
 
-<main class="container mx-auto px-10 pt-28">
+<main class="container mx-auto px-10 pt-28 print:pt-5">
     <section class="mb-10">
         <form class="flex items-center justify-center gap-4">
             {% csrf_token %}
-            <p class="font-exo font-bold text-xl mb-5">Resultados habilitadores</p>
-            <div class="flex flex-col gap-1 mb-6 xl:mb-4">
+            <p class="font-exo font-bold text-xl mb-5 print:w-1/2">Resultados habilitadores</p>
+            <div class="flex flex-col gap-1 mb-6 xl:mb-4 print:w-1/2">
                 {{ form.class_name }}
             </div>
         </form>
     </section>
 
-    <section id="response">
+    <section id="response" class="print:container mx-auto">
         {% include 'report/filterResultEnabled.html' %}
     </section>
 

@@ -6,7 +6,11 @@ module.exports = {
     '../apps/report/forms.py'
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        print: {raw : 'print'},
+      }
+    },
     fontFamily: {
       "exo": ['"exo 2"'],
       "rale": ['"Raleway"'],
