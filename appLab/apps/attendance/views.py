@@ -157,50 +157,54 @@ class ExelUploadForm(FormView):
             df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico', 'Tareas', 'Puntos', 'Puntos máximos'])
             df['Puntos'] = df['Puntos'].fillna(0).astype(int)
 
-            topic_result_to_create = []
-            topic_result_to_update = []
-
             for index, row in df.iterrows():
                 topico = self.change_name_by_id(row['Tareas'])
                 student = Students.objects.filter(email=row['Dirección de correo electrónico']).first()
+            
                 if student is None:
                     messages.error(
-                        self.request,
-                        "El archivo contiene datos inválidos: el estudiante no existe"
+                    self.request,
+                    f"El archivo contiene datos inválidos: el estudiante {row['Nombre']} no existe"
                     )
                     return self.form_invalid(form)
-                
+
                 if topico is None:
                     messages.error(
-                        self.request,
-                        f"No se encontró el tema para la tarea: {row['Tareas']}"
+                    self.request,
+                    f"No se encontró el tema para la tarea: {row['Tareas']}"
                     )
                     return self.form_invalid(form)
 
-                topic_result, created = TecnoEnabledResults.objects.update_or_create(
-                student=student,
-                topic=topico,
-                defaults={
-                    'score_result': row['Puntos'],
-                    'status': row['Puntos'] is not None and row['Puntos'] >= 60
-                }
-            )
-    
+                # Verificar si existe un registro previo para el estudiante y el tema
+                topic_result = TecnoEnabledResults.objects.filter(student=student, topic=topico).first()
+            
+                if topic_result:
+                # Si existe un registro previo, comparar las notas y actualizar si la nueva es mayor
+                    if row['Puntos'] > topic_result.score_result:
+                        topic_result.score_result = row['Puntos']
+                        topic_result.status = row['Puntos'] >= 60
+                        topic_result.save()
+                else:
+                # Si no existe un registro previo, crear uno nuevo
+                    TecnoEnabledResults.objects.create(
+                        student=student,
+                        topic=topico,
+                        score_result=row['Puntos'],
+                        status=row['Puntos'] >= 60
+                    )
+        
             messages.success(
-                self.request,
-                "Archivo subido con éxito"
+            self.request,
+            "Archivo subido con éxito"
             )
-
             return redirect(reverse_lazy("attendance_app:update-data"))
 
         except Exception as e:
             messages.error(
-                self.request,
-                f"Error al procesar el archivo: {str(e)}"
+            self.request,
+            f"Error al procesar el archivo: {str(e)}"
             )
             return self.form_invalid(form)
-
-        return super().form_valid(form)
     
 
 # Actualizacion de estudiantes
