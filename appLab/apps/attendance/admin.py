@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.core.exceptions import ObjectDoesNotExist
 from import_export.resources import ModelResource, Field
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
@@ -13,10 +14,13 @@ class TecnoEnabledResultResource(ModelResource):
 
     id = Field(column_name='ID')
     student = Field(column_name='Estudiante')
+    sex = Field(column_name='Sexo')
     year = Field(column_name='Año')
     stage = Field(column_name='Semestre')
     school = Field(column_name='Escuela')
     class_name = Field(column_name='Asignatura')
+    team = Field(column_name='Equipo')
+    challenge = Field(column_name='Reto')
     topic = Field(column_name='Habilitador')
     score_result = Field(column_name='Puntaje')
     status = Field(column_name='Estado')
@@ -35,6 +39,10 @@ class TecnoEnabledResultResource(ModelResource):
         student_last_name = getattr(obj.student, "last_name", "")
         return f'{student_name} {student_last_name}'
     
+    def dehydrate_sex(self, obj):
+        student_sex = getattr(obj.student, "sex", "")
+        return f'{student_sex}'
+    
     def dehydrate_year(self, obj):
         student_year = obj.student.class_name.year if obj.student.class_name else '-'
         return f'{student_year}'
@@ -50,6 +58,31 @@ class TecnoEnabledResultResource(ModelResource):
     def dehydrate_class_name(self, obj):
         student_class_name = getattr(obj.student.class_name, "name", "-")
         return f'{student_class_name}'
+    
+    def dehydrate_team(self, obj):
+        if obj.student and obj.student.class_name:
+            team = Teams.objects.filter(
+                class_name=obj.student.class_name,
+                team_name=obj.student
+            ).first()
+            
+            if team:
+                return f'{team.name}'
+        
+        return '-'
+    
+    def dehydrate_challenge(self, obj):
+        if obj.student and obj.student.class_name:
+            # Buscar el equipo al que pertenece el estudiante
+            team = Teams.objects.filter(
+                class_name=obj.student.class_name,
+                team_name=obj.student
+            ).first()
+            
+            if team and team.challenge:
+                return f'{team.challenge}'
+        
+        return '-'
     
     def dehydrate_topic(self, obj):
         student_topic = obj.topic.name
@@ -68,17 +101,19 @@ class AttendanceResource(ModelResource):
 
     id = Field(column_name='ID')
     student = Field(column_name='Estudiante')
+    sex = Field(column_name='Sexo')
     email = Field(column_name='Email')
     year = Field(column_name='Año')
     stage = Field(column_name='Semestre')
     school = Field(column_name='Escuela')
     class_name = Field(column_name='Asignatura')
+    team = Field(column_name='Equipo')
     date_in = Field(column_name='Hora de ingreso')
     time_inside = Field(column_name='Tiempo comprometido')
 
     class Meta:
         model = Attendance
-        fields = ('id', 'student', 'email', 'year', 'stage', 'school', 'class_name', 'date_in', 'time_inside')
+        fields = ('id', 'student', 'sex', 'email', 'year', 'stage', 'school', 'class_name', 'team', 'date_in', 'time_inside')
         batch_size = 500
 
     
@@ -89,12 +124,26 @@ class AttendanceResource(ModelResource):
             return None
 
     def import_obj(self, obj, data, dry_run, row_number=None, file_name=None, user=None):
+        
+    
+        try:
+            obj.student = Students.objects.get(email=data.get('Email'))
+        except ObjectDoesNotExist:
+            # Si el estudiante no existe, establecemos student como None
+            obj.student = None
+            # Opcionalmente, podrías registrar esto en un log o imprimir un mensaje
+            print(f"Advertencia: No se encontró estudiante con email {data.get('Email')} en la fila {row_number}")
+        
         obj.id = data.get('ID')
-        obj.student = Students.objects.get(email=data.get('Email'))
         obj.date_in = data.get('Hora de ingreso')
         obj.time_inside = data.get('Tiempo comprometido')
+    
         return obj
 
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        if instance.student is None:
+            return True
+        return False
 
     def dehydrate_id(self, obj):
         student_id = obj.id
@@ -104,6 +153,10 @@ class AttendanceResource(ModelResource):
         student_name = getattr(obj.student, "name", "")
         student_last_name = getattr(obj.student, "last_name", "")
         return f'{student_name} {student_last_name}'
+    
+    def dehydrate_sex(self, obj):
+        student_sex = getattr(obj.student, "sex", "")
+        return f'{student_sex}'
     
     def dehydrate_email(self, obj):
         student_year = obj.student.email if obj.student else '-'
@@ -136,6 +189,18 @@ class AttendanceResource(ModelResource):
         else:
             student_class_name = "-"
         return str(student_class_name)
+    
+    def dehydrate_team(self, obj):
+        if obj.student and obj.student.class_name:
+            team = Teams.objects.filter(
+                class_name=obj.student.class_name,
+                team_name=obj.student
+            ).first()
+            
+            if team:
+                return f'{team.name}'
+        
+        return '-'
     
     def dehydrate_date_in(self, obj):
         student_date_in = obj.date_in or '-'
@@ -293,7 +358,7 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
     inlines = (TecnoEnabledResultInline,)
-    list_display = ('display_full_name', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
+    list_display = ('display_full_name', 'sex', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
     list_filter = ('class_name__school__code', 'class_name__code')
     search_fields = ('name', 'last_name', 'email')
 
@@ -349,7 +414,7 @@ class AttendanceAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 
     @admin.display(description='Estudiante')
     def display_student_name(self, obj):
-        return f'{obj.student.name} {obj.student.last_name}'
+        return f'{obj.student.name if obj.student else ""} {obj.student.last_name if obj.student else ""}'
     
    
 @admin.register(TecnoEnabledResults)

@@ -64,6 +64,7 @@ class Students(models.Model):
     last_name = models.CharField('Apellido', max_length=32)
     email = models.EmailField('Email', null=True)
     class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_student', null=True, blank=True)
+    sex = models.CharField('Sexo', max_length=16, null=False, blank=False, default='Hombre')
     
     class Meta():
         verbose_name = "Estudiante"

@@ -1,0 +1,28 @@
+<!-- Hereda de plantilla principal -->
+{% extends 'base/base.html' %}
+
+<!-- Carga archivos estaticos -->
+{% load static %}
+
+<!-- Carga title page -->
+{% block title %}
+Resultados Habilitadores - LAB4.0
+{% endblock title %}
+
+<!-- Carga content page -->
+{% block content %}
+
+
+
+<main class="container mx-auto px-10 pt-28 print:pt-5">
+    <h1>Estado de los Estudiantes</h1>
+    <p>Total de estudiantes: {{ total_students }}</p>
+    <p>Estudiantes habilitados: {{ enabled_students }}</p>
+    <p>Estudiantes no habilitados: {{ disabled_students }}</p>
+
+    <div id="plotly-div">
+        {{ plot_div|safe }}
+    </div>
+</main>
+
+{% endblock content %}
