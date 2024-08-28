@@ -144,7 +144,7 @@ class AttendanceResource(ModelResource):
     location = Field(column_name='Sede') # OK
     class_name = Field(column_name='Asignatura') # OK
     team = Field(column_name='Equipo') # OK
-    date_in = Field(column_name='Hora de ingreso') # 
+    date_in = Field(column_name='Hora de ingreso') #OK
     time_inside = Field(column_name='Tiempo comprometido') # OK
 
     class Meta:
@@ -160,8 +160,7 @@ class AttendanceResource(ModelResource):
             return None
 
     def import_obj(self, obj, data, dry_run, row_number=None, file_name=None, user=None):
-        
-    
+            
         try:
             obj.student = Students.objects.get(email=data.get('Email'))
         except ObjectDoesNotExist:
@@ -284,6 +283,7 @@ class SchoolsResource(ModelResource):
 class StudentsResource(ModelResource):
 
     id = Field(column_name='ID') # OK
+    email = Field(column_name='Email')
     rut = Field(column_name='RUT') # OK
     student = Field(column_name='Estudiante') # OK
     sex = Field(column_name='Sexo') # OK
@@ -303,13 +303,17 @@ class StudentsResource(ModelResource):
 
     class Meta:
         model = Students
-        exclude = ('name', 'last_name', 'email')
-        se_bulk = True
+        import_id_fields = ['ID']
         batch_size = 500
 
+    
     def dehydrate_id(self, obj):
         student_id = obj.id
-        return f''
+        return f'{student_id}'
+    
+    def dehydrate_email(self, obj):
+        student_email = obj.email
+        return student_email
     
     def dehydrate_rut(self, obj):
         student_rut = obj.rut if obj.rut else None
@@ -332,7 +336,7 @@ class StudentsResource(ModelResource):
     
     def dehydrate_year(self, obj):
         class_year = obj.class_name.year
-        return class_year
+        return f'{class_year}'
     
     def dehydrate_stage(self, obj):
         class_stage = obj.class_name.get_stage_display()
@@ -378,7 +382,6 @@ class StudentsResource(ModelResource):
             ).first()
             return "Si" if team and team.technology else "No"
             
-
     def dehydrate_technology(self, obj):
         if obj.class_name:
             team = Teams.objects.filter(
@@ -401,19 +404,51 @@ class StudentsResource(ModelResource):
         
 
 class TeamsResource(ModelResource):   
-    team_name = Field(column_name='team_name', attribute='team_name',widget=ManyToManyWidget(Students, field='id', separator=','))
+    
+    def import_obj(self, obj, data, dry_run, row_number=None, file_name=None, user=None):
+        id = data["id"]
+        name = data["name"]
+        challenge = data["challenge"]
+        details = data["details"]
+        file = data["file"]
+        technology = data["technology"]
+        class_name = data["class_name"]
 
-    def before_import_row(self, row, **kwargs):
-        team_id = row['id']
-        team_ids = [int(sid) for sid in row.get("team_name", "").split(",") if sid.strip()]
-        instance, created = Teams.objects.get_or_create(id=team_id, defaults={'id': team_id})
-        if created:
-            instance.team_name.add(*team_ids)
+        obj.id = id
+        obj.name = name
+        obj.challenge = challenge
+        obj.details = details
+        obj.file = file
+        
+        try:
+            obj.technology = Technology.objects.get(id=id)
+        except ObjectDoesNotExist:
+            obj.technology = None  # O manejar el error de otra manera
+
+        try:
+            obj.class_name = Classes.objects.get(id=class_name)
+        except ObjectDoesNotExist:
+            obj.class_name = None
+
+        return obj
 
     class Meta:
         model = Teams
         batch_size = 500
       
+
+class TechnologyResource(ModelResource):
+    class Meta:
+        model = Technology
+        batch_size = 500
+
+
+class TopicEnabledResultResource(ModelResource):
+    class Meta:
+        model = TopicEnabled
+        batch_size = 500
+
+
 
 # Inlines
 class ClassesIline(admin.TabularInline):
@@ -612,14 +647,15 @@ class TecnoEnabledAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 
 
 @admin.register(TopicEnabled)
-class TecnoEnabledAdmin(admin.ModelAdmin):
+class TopicEnabledAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = TopicEnabledResultResource
     list_display = ('id', 'name', 'score')
     ordering = ('id', )
 
 
 @admin.register(Technology)
-class TechnologyAdmin(admin.ModelAdmin):
-    pass
+class TechnologyAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
+    resource_class = TechnologyResource
    
 
    
