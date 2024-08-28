@@ -20,3 +20,6 @@ DATABASES = {
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static/"]
+
+DOCUMENTS_URL = 'documents/'
+DOCUMENTS_ROOT = BASE_DIR / "documents/"

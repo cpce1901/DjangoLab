@@ -65,6 +65,9 @@ class Students(models.Model):
     email = models.EmailField('Email', null=True)
     class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_student', null=True, blank=True)
     sex = models.CharField('Sexo', max_length=16, null=False, blank=False, default='Hombre')
+    rut = models.CharField('rut', max_length=10, null=True, blank=True, unique=True)
+    score = models.FloatField('Nota', blank=True, null=True)
+    
     
     class Meta():
         verbose_name = "Estudiante"
@@ -75,8 +78,25 @@ class Students(models.Model):
         return f"{self.name} {self.last_name}"
 
 
+class Technology(models.Model):
+    name = models.CharField('Nombre', max_length=32)
+
+    class Meta():
+        verbose_name = "Tecnologia"
+        verbose_name_plural = "Tecnologias"
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.upper()
+
+        super(Technology, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class TopicEnabled(models.Model):
     name = models.CharField('Nombre', max_length=32)
+    technology = models.ForeignKey(Technology, on_delete=models.SET_NULL, null=True, blank=True)
     score = models.SmallIntegerField('Puntaje', null=True, blank=True)
 
     class Meta():
@@ -121,12 +141,20 @@ class TecnoEnabledResults(models.Model):
 class Teams(models.Model):
     name = models.CharField('Nombre', max_length=32)
     challenge = models.CharField('Reto', max_length=128, null=True, blank=True)
+    technology = models.ForeignKey(Technology, on_delete=models.SET_NULL, null=True, blank=True)
     class_name = models.ForeignKey(Classes, on_delete=models.SET_NULL, verbose_name='Asignatura', related_name='class_team', null=True, blank=True)
     team_name = models.ManyToManyField(Students, verbose_name='Equipo', related_name='team_student', blank=True)
+    details = models.TextField('Observaciones', null=True, blank=True)
+    file = models.FileField('Informe', upload_to='documents/', null=True, blank=True)
+    
 
     class Meta():
         verbose_name = "Equipo"
         verbose_name_plural = "Equipos"
+
+    def save(self, *args, **kwargs):
+        self.details = self.details.upper()
+        super(Teams, self).save(*args, **kwargs)
         
     def __str__(self):
         return f"{self.name} | {self.class_name.name} | {self.class_name.year}"

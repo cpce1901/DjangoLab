@@ -4,26 +4,30 @@ from django.core.exceptions import ObjectDoesNotExist
 from import_export.resources import ModelResource, Field
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
-from .models import Attendance, Students, Classes, Teams, Schools, TecnoEnabledResults, TopicEnabled
+from .models import Attendance, Students, Classes, Teams, Schools, TecnoEnabledResults, TopicEnabled, Technology
 from datetime import datetime
 
 
 
-# Resources
+# Resources HABILITADORES
 class TecnoEnabledResultResource(ModelResource):
 
-    id = Field(column_name='ID')
-    student = Field(column_name='Estudiante')
-    sex = Field(column_name='Sexo')
-    year = Field(column_name='Año')
-    stage = Field(column_name='Semestre')
-    school = Field(column_name='Escuela')
-    class_name = Field(column_name='Asignatura')
-    team = Field(column_name='Equipo')
-    challenge = Field(column_name='Reto')
-    topic = Field(column_name='Habilitador')
-    score_result = Field(column_name='Puntaje')
-    status = Field(column_name='Estado')
+    id = Field(column_name='ID') # OK
+    rut = Field(column_name='RUT') # OK
+    student = Field(column_name='Estudiante') # OK
+    sex = Field(column_name='Sexo') # OK
+    year = Field(column_name='Año') # OK
+    stage = Field(column_name='Semestre') # OK
+    school = Field(column_name='Carrera') # OK
+    location = Field(column_name='Sede') # OK
+    class_name = Field(column_name='Asignatura') # OK
+    team = Field(column_name='Equipo') # OK
+    challenge = Field(column_name='Reto') # OK
+    topic = Field(column_name='Habilitador') # OK
+    technology = Field(column_name='Tecnologia') # OK
+    score_result = Field(column_name='Puntaje') # OK
+    score_max = Field(column_name='Puntaje Maximo') # OK
+    status = Field(column_name='Estado') # OK
 
     class Meta:
         model = TecnoEnabledResults
@@ -32,7 +36,17 @@ class TecnoEnabledResultResource(ModelResource):
 
     def dehydrate_id(self, obj):
         student_id = obj.id
-        return f'{student_id}'
+        return f''
+    
+    def dehydrate_rut(self, obj):
+        student_rut = obj.student.rut if obj.student.rut else None
+        if student_rut:
+            student_rut_str = str(student_rut)
+            formatted_number = f"{student_rut_str[:2]}.{student_rut_str[2:5]}.{student_rut_str[5:8]}-{student_rut_str[8]}"
+
+            return formatted_number
+
+        return f'{student_rut}'
 
     def dehydrate_student(self, obj):
         student_name = getattr(obj.student, "name", "")
@@ -44,19 +58,23 @@ class TecnoEnabledResultResource(ModelResource):
         return f'{student_sex}'
     
     def dehydrate_year(self, obj):
-        student_year = obj.student.class_name.year if obj.student.class_name else '-'
+        student_year = obj.student.class_name.year if obj.student.class_name else ''
         return f'{student_year}'
     
     def dehydrate_stage(self, obj):
-        student_stage = obj.student.class_name.get_stage_display() if obj.student.class_name else '-'
+        student_stage = obj.student.class_name.get_stage_display() if obj.student.class_name else ''
         return f'{student_stage}'
     
     def dehydrate_school(self, obj):
-        student_school_name = obj.student.class_name.school.code if obj.student.class_name else '-'
+        student_school_name = obj.student.class_name.school.code if obj.student.class_name else ''
         return f'{student_school_name}'
     
+    def dehydrate_location(self, obj):
+        location_name = obj.student.class_name.school.get_sede_code_display() if obj.student.class_name else ''
+        return f'{location_name}'
+
     def dehydrate_class_name(self, obj):
-        student_class_name = getattr(obj.student.class_name, "name", "-")
+        student_class_name = getattr(obj.student.class_name, "name", "")
         return f'{student_class_name}'
     
     def dehydrate_team(self, obj):
@@ -86,12 +104,28 @@ class TecnoEnabledResultResource(ModelResource):
     
     def dehydrate_topic(self, obj):
         student_topic = obj.topic.name
+        if student_topic == 'F3D':
+            return "Fabricación 3D"
+        elif student_topic == 'VR':
+            return "Realidad virtual y Aumentada"
+        elif student_topic == 'IOT':
+            return "Internet de las cosas"
+        elif student_topic == 'IA':
+            return "Inteligencia Artificial"
+        else:
+           return "Róbotica"
+        
+    def dehydrate_technology(self, obj):
+        student_topic = obj.topic.name
         return f'{student_topic}'
     
     def dehydrate_score_result(self, obj):
-        student_score = obj.score_result if obj.score_result else 'No realizado'
+        student_score = obj.score_result if obj.score_result else 0
         return f'{student_score}'
     
+    def dehydrate_score_max(self, obj):
+        return 100
+
     def dehydrate_status(self, obj):
         student_status = 'Habilitado' if obj.status else 'No habilitado'
         return f'{student_status}'
@@ -99,21 +133,23 @@ class TecnoEnabledResultResource(ModelResource):
 
 class AttendanceResource(ModelResource):
 
-    id = Field(column_name='ID')
-    student = Field(column_name='Estudiante')
-    sex = Field(column_name='Sexo')
-    email = Field(column_name='Email')
-    year = Field(column_name='Año')
-    stage = Field(column_name='Semestre')
-    school = Field(column_name='Escuela')
-    class_name = Field(column_name='Asignatura')
-    team = Field(column_name='Equipo')
-    date_in = Field(column_name='Hora de ingreso')
-    time_inside = Field(column_name='Tiempo comprometido')
+    id = Field(column_name='ID') # OK
+    rut = Field(column_name='RUT') # OK
+    student = Field(column_name='Estudiante') # OK
+    sex = Field(column_name='Sexo') # OK
+    email = Field(column_name='Email') # OK
+    year = Field(column_name='Año') # OK
+    stage = Field(column_name='Semestre') # OK
+    school = Field(column_name='Carrera') # OK
+    location = Field(column_name='Sede') # OK
+    class_name = Field(column_name='Asignatura') # OK
+    team = Field(column_name='Equipo') # OK
+    date_in = Field(column_name='Hora de ingreso') # 
+    time_inside = Field(column_name='Tiempo comprometido') # OK
 
     class Meta:
         model = Attendance
-        fields = ('id', 'student', 'sex', 'email', 'year', 'stage', 'school', 'class_name', 'team', 'date_in', 'time_inside')
+        use_bulk = True
         batch_size = 500
 
     
@@ -148,6 +184,14 @@ class AttendanceResource(ModelResource):
     def dehydrate_id(self, obj):
         student_id = obj.id
         return f'{student_id}'
+    
+    def dehydrate_id(self, obj):
+        student_id = obj.id
+        return f'{student_id}'
+    
+    def dehydrate_rut(self, obj):
+        student_rut = obj.student.rut if obj.student.rut else '-'
+        return f'{student_rut}'
 
     def dehydrate_student(self, obj):
         student_name = getattr(obj.student, "name", "")
@@ -182,6 +226,13 @@ class AttendanceResource(ModelResource):
         else:
             student_school_name = '-'
         return str(student_school_name)
+    
+    def dehydrate_location(self, obj):
+        if obj.student and obj.student.class_name and obj.student.class_name.school:
+            student_school_sede_code = obj.student.class_name.school.get_sede_code_display()
+        else:
+            student_school_sede_code = '-'
+        return str(student_school_sede_code)
 
     def dehydrate_class_name(self, obj):
         if obj.student and obj.student.class_name:
@@ -209,8 +260,11 @@ class AttendanceResource(ModelResource):
         return f'{student_date_in}'
     
     def dehydrate_time_inside(self, obj):
-        student_time_inside = obj.time_inside or '-'
-        return f'{student_time_inside}'
+        student_time_inside = obj.time_inside
+        if student_time_inside:
+            return student_time_inside.hour
+        else:
+            return 0
 
 
 class ClassesResource(ModelResource):
@@ -228,13 +282,123 @@ class SchoolsResource(ModelResource):
 
 
 class StudentsResource(ModelResource):
-    class_name = Field(column_name='class_name', attribute='class_name',widget=ForeignKeyWidget(Classes, field='id'))
+
+    id = Field(column_name='ID') # OK
+    rut = Field(column_name='RUT') # OK
+    student = Field(column_name='Estudiante') # OK
+    sex = Field(column_name='Sexo') # OK
+    year = Field(column_name='Año') # OK
+    stage = Field(column_name='Semestre') # OK
+    school = Field(column_name='Carrera') # OK
+    location = Field(column_name='Sede') # OK
+    class_name = Field(column_name='Asignatura') # OK
+    team = Field(column_name='Equipo') # 
+    challenge = Field(column_name='Reto') # 
+    use_technology = Field(column_name='Utilizó Tecnologia 4.0') #
+    technology = Field(column_name='Habilitador Utilizado') #
+    use_abr = Field(column_name='Uso de ABR') #
+    use_scrum = Field(column_name='Uso de SCRUM') #
+    score = Field(column_name='Calificación') #
+    ready = Field(column_name='Cumple el reto') #
 
     class Meta:
         model = Students
+        exclude = ('name', 'last_name', 'email')
         se_bulk = True
         batch_size = 500
 
+    def dehydrate_id(self, obj):
+        student_id = obj.id
+        return f''
+    
+    def dehydrate_rut(self, obj):
+        student_rut = obj.rut if obj.rut else None
+        if student_rut:
+            student_rut_str = str(student_rut)
+            formatted_number = f"{student_rut_str[:2]}.{student_rut_str[2:5]}.{student_rut_str[5:8]}-{student_rut_str[8]}"
+
+            return formatted_number
+
+        return f'{student_rut}'
+    
+    def dehydrate_student(self, obj):
+        student_name = obj.name
+        student_last_name = obj.last_name
+        return f'{student_name} {student_last_name}'
+    
+    def dehydrate_sex(self, obj):
+        student_sex = obj.sex
+        return f'{student_sex}'
+    
+    def dehydrate_year(self, obj):
+        class_year = obj.class_name.year
+        return class_year
+    
+    def dehydrate_stage(self, obj):
+        class_stage = obj.class_name.get_stage_display()
+        return class_stage
+    
+    def dehydrate_school(self, obj):
+        school_code = obj.class_name.school.code
+        return school_code
+    
+    def dehydrate_location(self, obj):
+        location_name = obj.class_name.school.get_sede_code_display()
+        return location_name
+
+    def dehydrate_class_name(self, obj):
+        school_name = obj.class_name.name
+        return school_name
+    
+    def dehydrate_team(self, obj):
+        if obj.class_name:
+            team = Teams.objects.filter(
+                class_name=obj.class_name,
+                team_name=obj
+            ).first()
+            
+            if team:
+                return f'{team.name}'
+        
+        return '-'
+    
+    def dehydrate_challenge(self, obj):
+        if obj.class_name:
+            team = Teams.objects.filter(
+                class_name=obj.class_name,
+                team_name=obj
+            ).first()
+            
+            return f'{team.challenge}' if team and team.challenge else ''
+        
+    def dehydrate_use_technology(self, obj):
+        if obj.class_name:
+            team = Teams.objects.filter(
+                team_name=obj
+            ).first()
+            return "Si" if team and team.technology else "No"
+            
+
+    def dehydrate_technology(self, obj):
+        if obj.class_name:
+            team = Teams.objects.filter(
+                team_name=obj
+            ).first()
+            
+            return f'{team.technology.name}' if team and team.technology else 'OTRO'
+        
+    def dehydrate_use_abr(self, obj):
+        return "Si"
+    
+    def dehydrate_use_scrum(self, obj):
+        return "Si"
+    
+    def dehydrate_score(self, obj):            
+        return f'{obj.score}' if obj.score else ''
+    
+    def dehydrate_ready(self, obj):
+        return 'SI' if obj.score >= 4.0 else 'No' 
+        
 
 class TeamsResource(ModelResource):   
     team_name = Field(column_name='team_name', attribute='team_name',widget=ManyToManyWidget(Students, field='id', separator=','))
@@ -324,8 +488,8 @@ class ClassesAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
 @admin.register(Teams)
 class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
     resource_class = TeamsResource    
-    list_display = ('name', 'display_class_name', 'display_class_name_year', 'display_class_name_stage', 'display_students', 'challenge')
-    list_filter = ('class_name__school__code', 'class_name__year', 'class_name__stage')
+    list_display = ('name', 'display_class_name', 'display_class_name_year', 'display_class_name_stage', 'display_students', 'challenge', 'technology', 'details', 'display_file_exists')
+    list_filter = ('class_name__school__code', 'class_name__code', 'class_name__year', 'class_name__stage')
     filter_vertical = ('team_name',)
 
     @admin.display(description='Asignatura')
@@ -352,15 +516,24 @@ class TeamsAdmin(ImportExportModelAdmin, ExportActionModelAdmin):
             return format_html(output)
         else:
             return ''
+        
+    @admin.display(description='Informe')
+    def display_file_exists(self, obj):
+        file = obj.file
+        if not file:
+            return '❌'   
+    
+        return '✅'  
+
    
 
 @admin.register(Students) 
 class StudentsAdmin(ImportExportModelAdmin, ExportActionModelAdmin): 
     resource_class = StudentsResource
     inlines = (TecnoEnabledResultInline,)
-    list_display = ('display_full_name', 'sex', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled')
+    list_display = ('display_full_name', 'rut', 'sex', 'email', 'display_class_name', 'display_class_year', 'display_class_stage', 'display_team', 'display_tecno_enabled', 'score')
     list_filter = ('class_name__school__code', 'class_name__code')
-    search_fields = ('name', 'last_name', 'email')
+    search_fields = ('name', 'last_name', 'email', 'rut')
 
     @admin.display(description='Nombre completo')
     def display_full_name(self, obj):
@@ -443,8 +616,10 @@ class TecnoEnabledAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'score')
     ordering = ('id', )
 
-  
 
+@admin.register(Technology)
+class TechnologyAdmin(admin.ModelAdmin):
+    pass
    
 
    
