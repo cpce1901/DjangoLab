@@ -406,31 +406,40 @@ class StudentsResource(ModelResource):
 class TeamsResource(ModelResource):   
     
     def import_obj(self, obj, data, dry_run, row_number=None, file_name=None, user=None):
-        id = data["id"]
-        name = data["name"]
-        challenge = data["challenge"]
-        details = data["details"]
-        file = data["file"]
-        technology = data["technology"]
-        class_name = data["class_name"]
+        id = data.get("id")
+        name = data.get("name")
+        challenge = data.get("challenge")
+        details = data.get("details")
+        file = data.get("file")
+        technology = data.get("technology")
+        class_name = data.get("class_name")
 
         obj.id = id
         obj.name = name
         obj.challenge = challenge
         obj.details = details
         obj.file = file
-        
-        try:
-            obj.technology = Technology.objects.get(id=technology)
-        except ObjectDoesNotExist:
-            obj.technology = None  
 
-        try:
-            obj.class_name = Classes.objects.get(id=class_name)
-        except ObjectDoesNotExist:
+        # Verificar si technology es un número válido
+        if technology:
+            try:
+                obj.technology = Technology.objects.get(id=int(technology))
+            except ObjectDoesNotExist:
+                obj.technology = None
+        else:
+            obj.technology = None
+
+        # Verificar si class_name es un número válido
+        if class_name:
+            try:
+                obj.class_name = Classes.objects.get(id=int(class_name))
+            except ObjectDoesNotExist:
+                obj.class_name = None
+        else:
             obj.class_name = None
 
         return obj
+
 
     class Meta:
         model = Teams
