@@ -421,9 +421,9 @@ class TeamsResource(ModelResource):
         obj.file = file
         
         try:
-            obj.technology = Technology.objects.get(id=id)
+            obj.technology = Technology.objects.get(id=technology)
         except ObjectDoesNotExist:
-            obj.technology = None  # O manejar el error de otra manera
+            obj.technology = None  
 
         try:
             obj.class_name = Classes.objects.get(id=class_name)
