@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import transaction
 
 
 class Schools(models.Model):
@@ -76,6 +77,24 @@ class Students(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.last_name}"
+
+    def save(self, *args, **kwargs):
+        # Sobrescribimos el método save para asignar tecnologías automáticamente.
+        creating = self.pk is None  # Verificamos si el estudiante se está creando (nuevo objeto)
+        super(Students, self).save(*args, **kwargs)
+
+        if creating:
+            # Asignamos todas las tecnologías con un puntaje inicial de 0
+            from .models import TopicEnabled, TecnoEnabledResults
+
+            # Garantizamos que la operación sea atómica
+            with transaction.atomic():
+                tecnologias = TopicEnabled.objects.all()
+                resultados = [
+                    TecnoEnabledResults(student=self, topic=tecnologia, score_result=0, status=False)
+                    for tecnologia in tecnologias
+                ]
+                TecnoEnabledResults.objects.bulk_create(resultados)
 
 
 class Technology(models.Model):

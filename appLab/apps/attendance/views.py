@@ -156,7 +156,7 @@ class ExelUploadForm(FormView):
     def form_valid(self, form):
         uploaded_file = self.request.FILES['file']
         try:
-            df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Apellidos', 'Dirección de correo electrónico', 'Tareas', 'Puntos', 'Puntos máximos'])
+            df = pd.read_excel(uploaded_file, header=1, usecols=['Nombre', 'Dirección de correo electrónico', 'Tareas', 'Puntos'])
             df['Puntos'] = df['Puntos'].fillna(0).astype(int)
 
             for index, row in df.iterrows():
